@@ -112,8 +112,39 @@
   .fee-unit { font-size:11px; color:var(--muted); }
   .contact-btn { background:var(--accent2); color:#fff; border:none; padding:9px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; text-decoration:none; display:inline-block; text-align:center; }
   .contact-btn:hover { background:#1d4ed8; }
-  .dhl-compare { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); text-decoration:none; transition:color .2s; margin-top:4px; }
-  .dhl-compare:hover { color:#FFCC00; }
+  .book-btn { background:var(--green); color:#fff; border:none; padding:9px 16px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; display:inline-block; text-align:center; width:100%; }
+  .book-btn:hover { background:#0d9e6e; }
+  .book-btn:disabled { opacity:.5; cursor:not-allowed; }
+  .payout-btn { background:var(--accent); color:#000; border:none; padding:9px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; display:inline-block; text-align:center; width:100%; margin-top:6px; }
+  .payout-btn:hover { background:#f0b030; }
+  .locked-badge { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); padding:4px 8px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:6px; }
+
+  /* ── BOOKING MODAL ── */
+  .modal.booking { max-width:560px; }
+  .booking-summary { background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:10px; padding:14px 16px; margin-bottom:16px; }
+  .booking-summary-row { display:flex; justify-content:space-between; font-size:13px; padding:3px 0; }
+  .booking-summary-row span:first-child { color:var(--muted); }
+  .booking-summary-row span:last-child { font-weight:600; color:var(--text); }
+  .booking-summary-row.total span { color:var(--green); font-size:15px; }
+  .booking-summary-row.commission span:last-child { color:var(--accent); }
+  .payment-field { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+  .payment-field label { font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+  .payment-field input { background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); padding:11px 14px; font-size:14px; font-family:'DM Sans',sans-serif; }
+  .payment-field input:focus { outline:none; border-color:var(--green); }
+  #stripe-card-element { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:13px 14px; }
+  .escrow-note { background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:8px; padding:10px 14px; font-size:12px; color:var(--green); margin:12px 0; line-height:1.5; }
+  .btn-pay { background:var(--green); color:#fff; border:none; padding:14px; border-radius:10px; font-weight:700; font-size:15px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; width:100%; margin-top:8px; }
+  .btn-pay:hover { background:#0d9e6e; }
+  .btn-pay:disabled { opacity:.5; cursor:not-allowed; }
+
+  /* ── CONFIRM DELIVERY MODAL ── */
+  .confirm-row { display:flex; gap:10px; margin-top:16px; }
+  .btn-confirm { background:var(--green); color:#fff; border:none; padding:11px 20px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; font-family:'DM Sans',sans-serif; flex:1; }
+  .btn-dispute { background:transparent; color:var(--red); border:1px solid var(--red); padding:11px 20px; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer; font-family:'DM Sans',sans-serif; flex:1; }
+
+  /* ── PAYOUT STATUS BADGE ── */
+  .payout-ready { display:inline-flex; align-items:center; gap:4px; font-size:11px; background:rgba(16,185,129,0.12); color:var(--green); border:1px solid rgba(16,185,129,0.3); padding:3px 8px; border-radius:4px; font-weight:600; }
+  .payout-pending { display:inline-flex; align-items:center; gap:4px; font-size:11px; background:rgba(232,160,32,0.12); color:var(--accent); border:1px solid rgba(232,160,32,0.3); padding:3px 8px; border-radius:4px; font-weight:600; }
   .dhl-logo { font-weight:800; color:#FFCC00; font-size:12px; }
 
   /* ── RATINGS DISPLAY ── */
@@ -221,12 +252,74 @@
 </head>
 <body>
 
+<script src="https://js.stripe.com/v3/"></script>
+
 <div id="setup-banner">
   <span><span class="status-dot demo"></span> Demo Mode — sample data. Connect Supabase to go live.</span>
   <button onclick="openConfig()">⚙️ Connect Supabase</button>
 </div>
 
-<!-- CONFIG MODAL -->
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal booking">
+    <h2>📦 Book Shipment</h2>
+    <p id="booking-modal-sub">Your payment is held securely in escrow until delivery is confirmed.</p>
+    <div class="booking-summary" id="booking-summary"></div>
+    <div class="payment-field"><label>Your Name</label><input type="text" id="bk-name" placeholder="Full name"/></div>
+    <div class="payment-field"><label>Your Email</label><input type="email" id="bk-email" placeholder="your@email.com"/></div>
+    <div class="payment-field"><label>WhatsApp / Phone (optional)</label><input type="text" id="bk-phone" placeholder="+1 xxx xxx xxxx"/></div>
+    <div class="payment-field"><label>Package Description</label><input type="text" id="bk-desc" placeholder="e.g. Clothing, documents, vitamins"/></div>
+    <div class="payment-field"><label>Weight (kg)</label><input type="number" id="bk-weight" placeholder="e.g. 3" min="0.5" max="30" step="0.5" oninput="updateBookingSummary()"/></div>
+    <div class="escrow-note">🔒 Your payment is held in escrow. The traveler only receives payment after you confirm delivery. You have 48 hours to raise a dispute.</div>
+    <div class="payment-field"><label>Card Details</label>
+      <div id="stripe-card-element"></div>
+      <div id="stripe-card-errors" style="color:var(--red);font-size:12px;margin-top:6px;"></div>
+    </div>
+    <button class="btn-pay" id="btn-pay" onclick="processPayment()">🔒 Pay &amp; Book Securely</button>
+    <div class="modal-actions" style="margin-top:12px;"><button class="btn-cancel" onclick="closeBooking()">Cancel</button></div>
+  </div>
+</div>
+
+<!-- CONFIRM DELIVERY MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h2>✅ Confirm Delivery</h2>
+    <p>Has your package been delivered? Confirming releases payment to the traveler.</p>
+    <div class="payment-field"><label>Your Email</label><input type="email" id="cf-email" placeholder="your@email.com"/></div>
+    <div class="payment-field"><label>Booking ID</label><input type="text" id="cf-booking-id" placeholder="e.g. 42"/></div>
+    <div class="confirm-row">
+      <button class="btn-confirm" onclick="confirmDelivery()">✅ Yes, Delivered</button>
+      <button class="btn-dispute" onclick="openDispute()">⚠ Raise Dispute</button>
+    </div>
+    <div class="modal-actions" style="margin-top:12px;"><button class="btn-cancel" onclick="closeConfirm()">Close</button></div>
+  </div>
+</div>
+
+<!-- DISPUTE MODAL -->
+<div class="modal-overlay" id="dispute-modal">
+  <div class="modal">
+    <h2>⚠ Raise a Dispute</h2>
+    <p>Our team will review within 48 hours and contact both parties.</p>
+    <div class="payment-field"><label>Reason</label>
+      <select id="dp-reason" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;width:100%;">
+        <option value="not_delivered">Package not delivered</option>
+        <option value="damaged">Package arrived damaged</option>
+        <option value="wrong_items">Wrong items delivered</option>
+        <option value="partial">Only part of package delivered</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="payment-field"><label>Details</label>
+      <textarea id="dp-details" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;width:100%;min-height:80px;resize:vertical;" placeholder="Describe what happened..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDispute()">Cancel</button>
+      <button class="btn-save" onclick="submitDispute()" style="background:var(--red);color:#fff;">Submit Dispute</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal-overlay" id="config-modal">
   <div class="modal">
     <h2>🔌 Connect to Supabase</h2>
@@ -238,9 +331,9 @@
       <div class="setup-step"><span class="step-badge">4</span><div>Paste them below and click Save!</div></div>
     </div>
     <label>Supabase Project URL</label>
-    <input id="sb-url" type="url" placeholder="hhttps://dnqruxabikiwoqoqyrmv.supabase.co"/>
+    <input id="sb-url" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co"/>
     <label>Supabase Anon Key</label>
-    <input id="sb-key" type="text" placeholder="sb_publishable_1YxIk5us0MKYykIUQ4jRUA_ATbmnbok"/>
+    <input id="sb-key" type="text" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."/>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeConfig()">Cancel</button>
       <button class="btn-save" onclick="saveConfig()">✓ Save & Connect</button>
@@ -440,6 +533,7 @@
 <footer class="site-footer">
   <div class="footer-links">
     <a onclick="openLegal()">📋 Terms of Use</a>
+    <a onclick="openConfirmDelivery()" style="cursor:pointer">✅ Confirm Delivery</a>
     <a onclick="openLegal()">🚫 Prohibited Items</a>
     <a href="https://www.dhl.com/us-en/home/get-a-quote.html" target="_blank">DHL Rate Calculator</a>
     <a onclick="openConfig()">⚙️ Connect Supabase</a>
@@ -451,6 +545,8 @@
 
 <script>
 const SB_URL_K = 'll_sb_url', SB_KEY_K = 'll_sb_key';
+const DEFAULT_SB_URL = 'https://dnqruxabikiwoqoqyrmv.supabase.co';
+const DEFAULT_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRucXJ1eGFiaWtpd29xb3F5cm12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNDg4OTMsImV4cCI6MjA5MjkyNDg5M30.ZjeSz1UXbOxoWeR4F15cS0FANOy9s9bsLinCf6w9orE';
 let sb = null, curFilter = 'all', posts = [], reviews = {};
 
 /* ── DEMO DATA ── */
@@ -478,6 +574,8 @@ const DEMO_R = {
 
 /* ── SUPABASE ── */
 function initSB(){
+  if(!localStorage.getItem(SB_URL_K)) localStorage.setItem(SB_URL_K, DEFAULT_SB_URL);
+  if(!localStorage.getItem(SB_KEY_K)) localStorage.setItem(SB_KEY_K, DEFAULT_SB_KEY);
   const u=localStorage.getItem(SB_URL_K), k=localStorage.getItem(SB_KEY_K);
   if(u&&k){try{sb=window.supabase.createClient(u,k);document.getElementById('setup-banner').innerHTML=`<span><span class="status-dot active"></span>Connected to Supabase — Live data active</span><button onclick="openConfig()">⚙️ Reconfigure</button>`;return true;}catch(e){}}
   return false;
@@ -492,7 +590,8 @@ function saveConfig(){
   const u=document.getElementById('sb-url').value.trim(),k=document.getElementById('sb-key').value.trim();
   if(!u||!k){showToast('Please enter both URL and key.',true);return;}
   localStorage.setItem(SB_URL_K,u);localStorage.setItem(SB_KEY_K,k);
-  closeConfig();initSB();loadAll();showToast('✓ Connected to Supabase!');
+  closeConfig();initSB();
+  initStripe();loadAll();showToast('✓ Connected to Supabase!');
 }
 
 /* ── LOAD ALL ── */
@@ -630,8 +729,8 @@ function buildCard(p,today){
       <div class="listing-right">
         <div class="fee-badge"><div class="fee-amount">$${p.fee_per_kg}</div><div class="fee-unit">per kg</div></div>
         <div>
-          <a href="mailto:${esc(p.contact)}" class="contact-btn">Contact</a>
           <a href="https://www.dhl.com/us-en/home/get-a-quote.html" target="_blank" class="dhl-compare">vs <span class="dhl-logo">DHL</span> rates ↗</a>
+          <button class="book-btn" onclick="openBooking(${p.id}, '${esc(p.name)}', ${p.fee_per_kg}, ${p.max_kg})">🔒 Book &amp; Pay Securely</button>
         </div>
       </div>
     </div>
@@ -671,12 +770,219 @@ function updateStats(){
   document.getElementById('stat-reviews').textContent=totalRevs;
 }
 
-window.addEventListener('DOMContentLoaded',()=>{
-  const today=new Date().toISOString().split('T')[0];
+// ─── ESCROW & STRIPE ──────────────────────────────────────
+const STRIPE_PK = 'pk_test_YOUR_STRIPE_PUBLISHABLE_KEY'; // Replace with your Stripe publishable key
+const API_BASE  = '/api/escrow';
+
+let stripeInstance = null;
+let stripeCard     = null;
+let currentBooking = { post_id: null, traveler_name: '', fee_per_kg: 0, max_kg: 0 };
+let activeBookingId = null;
+
+function initStripe() {
+  if (typeof Stripe === 'undefined') return;
+  stripeInstance = Stripe(STRIPE_PK);
+}
+
+// ── OPEN BOOKING MODAL ────────────────────────────────────
+function openBooking(post_id, traveler_name, fee_per_kg, max_kg) {
+  currentBooking = { post_id, traveler_name, fee_per_kg, max_kg };
+  document.getElementById('booking-modal-sub').textContent =
+    `Booking with ${traveler_name} — $${fee_per_kg}/kg`;
+  document.getElementById('bk-weight').value = '';
+  document.getElementById('bk-name').value   = '';
+  document.getElementById('bk-email').value  = '';
+  document.getElementById('bk-phone').value  = '';
+  document.getElementById('bk-desc').value   = '';
+  document.getElementById('booking-summary').innerHTML = `
+    <div class="booking-summary-row"><span>Traveler</span><span>${traveler_name}</span></div>
+    <div class="booking-summary-row"><span>Rate</span><span>$${fee_per_kg}/kg</span></div>
+    <div class="booking-summary-row"><span>Max weight</span><span>${max_kg} kg</span></div>
+    <div class="booking-summary-row total"><span>Enter weight above to see total</span><span></span></div>`;
+  document.getElementById('booking-modal').classList.add('open');
+
+  // Mount Stripe card element
+  if (stripeInstance) {
+    const elements = stripeInstance.elements({
+      appearance: { theme: 'night', variables: { colorPrimary: '#10b981' } }
+    });
+    stripeCard = elements.create('card', { hidePostalCode: true });
+    stripeCard.mount('#stripe-card-element');
+    stripeCard.on('change', e => {
+      document.getElementById('stripe-card-errors').textContent = e.error ? e.error.message : '';
+    });
+  } else {
+    document.getElementById('stripe-card-element').innerHTML =
+      '<p style="color:var(--yellow);font-size:12px;">⚠ Add your Stripe publishable key to enable payments</p>';
+  }
+}
+
+function closeBooking() {
+  document.getElementById('booking-modal').classList.remove('open');
+  if (stripeCard) { try { stripeCard.unmount(); } catch(e) {} stripeCard = null; }
+}
+
+function updateBookingSummary() {
+  const w   = parseFloat(document.getElementById('bk-weight').value) || 0;
+  const fee = currentBooking.fee_per_kg;
+  const sub = (w * fee).toFixed(2);
+  const com = (w * fee * 0.10).toFixed(2);
+  const tot = (w * fee).toFixed(2);
+  document.getElementById('booking-summary').innerHTML = `
+    <div class="booking-summary-row"><span>Traveler</span><span>${currentBooking.traveler_name}</span></div>
+    <div class="booking-summary-row"><span>${w} kg × $${fee}/kg</span><span>$${sub}</span></div>
+    <div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${com}</span></div>
+    <div class="booking-summary-row"><span>Traveler receives</span><span>$${(sub - com).toFixed(2)}</span></div>
+    <div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${tot}</b></span></div>`;
+}
+
+// ── PROCESS PAYMENT ───────────────────────────────────────
+async function processPayment() {
+  const name   = document.getElementById('bk-name').value.trim();
+  const email  = document.getElementById('bk-email').value.trim();
+  const phone  = document.getElementById('bk-phone').value.trim();
+  const desc   = document.getElementById('bk-desc').value.trim();
+  const weight = parseFloat(document.getElementById('bk-weight').value);
+
+  if (!name || !email || !weight || weight <= 0) {
+    showToast('Please fill in all required fields.', true); return;
+  }
+  if (weight > currentBooking.max_kg) {
+    showToast(`Max weight for this traveler is ${currentBooking.max_kg} kg.`, true); return;
+  }
+
+  const btn = document.getElementById('btn-pay');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  try {
+    // Create payment intent on backend
+    const res = await fetch(`${API_BASE}?action=create_payment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        post_id: currentBooking.post_id,
+        sender_name: name,
+        sender_email: email,
+        sender_phone: phone,
+        package_description: desc,
+        weight_kg: weight,
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    activeBookingId = data.booking_id;
+
+    if (!stripeInstance || !stripeCard) {
+      // Demo mode — no real Stripe
+      showToast(`✓ Booking #${data.booking_id} created! (Demo — add Stripe key for real payments)`, false);
+      closeBooking();
+      btn.disabled = false;
+      btn.textContent = '🔒 Pay & Book Securely';
+      return;
+    }
+
+    // Confirm payment with Stripe
+    const { error: stripeError } = await stripeInstance.confirmCardPayment(
+      data.client_secret, {
+        payment_method: { card: stripeCard, billing_details: { name, email } }
+      }
+    );
+
+    if (stripeError) throw new Error(stripeError.message);
+
+    showToast(`✓ Booking #${data.booking_id} confirmed! Payment held in escrow.`);
+    closeBooking();
+
+  } catch (e) {
+    showToast(e.message, true);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔒 Pay & Book Securely';
+}
+
+// ── CONFIRM DELIVERY ──────────────────────────────────────
+function openConfirmDelivery() {
+  document.getElementById('confirm-modal').classList.add('open');
+  if (activeBookingId) document.getElementById('cf-booking-id').value = activeBookingId;
+}
+function closeConfirm() { document.getElementById('confirm-modal').classList.remove('open'); }
+
+async function confirmDelivery() {
+  const email      = document.getElementById('cf-email').value.trim();
+  const booking_id = document.getElementById('cf-booking-id').value.trim();
+  if (!email || !booking_id) { showToast('Please enter your email and booking ID.', true); return; }
+
+  try {
+    const res = await fetch(`${API_BASE}?action=confirm_delivery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_id: parseInt(booking_id), sender_email: email })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showToast('✓ Delivery confirmed! Traveler payout released.');
+    closeConfirm();
+  } catch (e) {
+    showToast(e.message, true);
+  }
+}
+
+// ── DISPUTE ───────────────────────────────────────────────
+function openDispute() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  document.getElementById('dispute-modal').classList.add('open');
+}
+function closeDispute() { document.getElementById('dispute-modal').classList.remove('open'); }
+
+async function submitDispute() {
+  const email      = document.getElementById('cf-email').value.trim();
+  const booking_id = document.getElementById('cf-booking-id').value.trim();
+  const reason     = document.getElementById('dp-reason').value;
+  const details    = document.getElementById('dp-details').value.trim();
+  if (!email || !booking_id || !details) { showToast('Please fill in all fields.', true); return; }
+
+  try {
+    const res = await fetch(`${API_BASE}?action=raise_dispute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_id: parseInt(booking_id), sender_email: email, reason, details })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showToast('⚠ Dispute raised. We will review within 48 hours.');
+    closeDispute();
+  } catch (e) {
+    showToast(e.message, true);
+  }
+}
+
+// ── TRAVELER PAYOUT SETUP ─────────────────────────────────
+async function setupPayouts(post_id, traveler_name, traveler_email) {
+  showToast('Opening Stripe payout setup...');
+  try {
+    const res = await fetch(`${API_BASE}?action=onboard`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id, traveler_name, traveler_email })
+    });
+    const data = await res.json();
+    if (data.url) window.open(data.url, '_blank');
+    else showToast(data.error || 'Could not start onboarding.', true);
+  } catch (e) {
+    showToast('Could not connect to payment server. Deploy backend first.', true);
+  }
+}
+
+window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOString().split('T')[0];
   document.getElementById('f-date').min=today;
   document.getElementById('f-return').min=today;
   if(localStorage.getItem(SB_URL_K)){document.getElementById('sb-url').value=localStorage.getItem(SB_URL_K);document.getElementById('sb-key').value=localStorage.getItem(SB_KEY_K);}
-  initSB();loadAll();
+  initSB();
+  initStripe();loadAll();
 });
 </script>
 </body>
