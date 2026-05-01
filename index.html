@@ -115,6 +115,9 @@
   .book-btn { background:var(--green); color:#fff; border:none; padding:9px 16px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; display:inline-block; text-align:center; width:100%; }
   .book-btn:hover { background:#0d9e6e; }
   .book-btn:disabled { opacity:.5; cursor:not-allowed; }
+  .type-btn { background:var(--surface); border:2px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--muted); text-align:center; transition:all .2s; line-height:1.5; }
+  .type-btn:hover { border-color:var(--accent); color:var(--text); }
+  .type-btn-active { border-color:var(--green) !important; background:rgba(16,185,129,0.08) !important; color:var(--text) !important; }
   .payout-btn { background:var(--accent); color:#000; border:none; padding:9px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; display:inline-block; text-align:center; width:100%; margin-top:6px; }
   .payout-btn:hover { background:#f0b030; }
   .locked-badge { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); padding:4px 8px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:6px; }
@@ -317,11 +320,40 @@
     <h2>📦 Book Shipment</h2>
     <p id="booking-modal-sub">Your payment is held securely in escrow until delivery is confirmed.</p>
     <div class="booking-summary" id="booking-summary"></div>
+
+    <!-- BOOKING TYPE SELECTOR -->
+    <div class="payment-field">
+      <label>Booking Type</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
+        <button id="type-btn-kg"   class="type-btn type-btn-active" onclick="setBookingType('kg')">
+          ⚖️ <strong>By Weight</strong><br/><span style="font-size:11px;font-weight:400;">Pay per kg</span>
+        </button>
+        <button id="type-btn-bag"  class="type-btn" onclick="setBookingType('bag')">
+          🧳 <strong>Entire Extra Bag</strong><br/><span style="font-size:11px;font-weight:400;">Flat fee — $175</span>
+        </button>
+      </div>
+    </div>
+
     <div class="payment-field"><label>Your Name</label><input type="text" id="bk-name" placeholder="Full name"/></div>
     <div class="payment-field"><label>Your Email</label><input type="email" id="bk-email" placeholder="your@email.com"/></div>
     <div class="payment-field"><label>WhatsApp / Phone (optional)</label><input type="text" id="bk-phone" placeholder="+1 xxx xxx xxxx"/></div>
     <div class="payment-field"><label>Package Description</label><input type="text" id="bk-desc" placeholder="e.g. Clothing, documents, vitamins"/></div>
-    <div class="payment-field"><label>Weight (kg)</label><input type="number" id="bk-weight" placeholder="e.g. 3" min="0.5" max="30" step="0.5" oninput="updateBookingSummary()"/></div>
+
+    <!-- PER KG WEIGHT INPUT (shown for kg bookings) -->
+    <div id="weight-field" class="payment-field">
+      <label>Weight (kg)</label>
+      <input type="number" id="bk-weight" placeholder="e.g. 3" min="0.5" max="30" step="0.5" oninput="updateBookingSummary()"/>
+    </div>
+
+    <!-- ENTIRE BAG NOTE (shown for bag bookings) -->
+    <div id="bag-field" style="display:none;">
+      <div style="background:rgba(232,160,32,0.07);border:1px solid rgba(232,160,32,0.25);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;">
+        🧳 <strong style="color:var(--accent)">Entire Extra Bag — $175 flat fee</strong><br/>
+        The traveler dedicates their full extra checked bag (up to 23kg) exclusively to your shipment. 
+        Maximum weight: <strong>23kg</strong>. Contents must comply with all customs laws.
+      </div>
+    </div>
+
     <div class="escrow-note">🔒 Your payment is held in escrow. The traveler only receives payment after you confirm delivery. You have 48 hours to raise a dispute.</div>
     <div class="contract-box">
       <h4>📄 Shipping Agreement — Summary</h4>
@@ -562,56 +594,48 @@
     <!-- EARNINGS CALCULATOR -->
     <div class="earnings-calc">
       <div class="earnings-calc-header">
-        <div class="earnings-calc-title">💰 How Much Can You <span>Earn?</span></div>
-        <button class="earnings-toggle-btn" id="calc-toggle" onclick="toggleCalc()">▲ Hide Calculator</button>
+        <div class="earnings-calc-title">💰 Extra Bag <span>Earnings Calculator</span></div>
+        <button class="earnings-toggle-btn" id="calc-toggle" onclick="toggleCalc()">▲ Hide</button>
       </div>
       <div class="earnings-body" id="earnings-body">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">
+          Already have your free bags covered. See exactly how much you earn by buying <strong style="color:var(--text)">one extra checked bag</strong> purely for cargo.
+        </p>
+
         <div class="calc-row">
           <div class="calc-field">
             <label>Your Airline</label>
             <select id="calc-airline" onchange="calcEarnings()">
-              <optgroup label="── 2 Free Bags (Standard) ──">
-                <option value="brussels">Brussels Airlines — 2 free bags (46kg)</option>
-                <option value="delta">Delta Air Lines — 2 free bags (46kg)</option>
-                <option value="united_free">United Airlines — 2 free bags (46kg)</option>
-                <option value="other_free">Other Airline — 2 free bags (46kg)</option>
-              </optgroup>
-              <optgroup label="── 1 Free + Buy Extra Bags ──">
-                <option value="united_pay">United Airlines — 1 free + buy 2nd bag ($55)</option>
-                <option value="other_pay">Other Airline — 1 free + buy 2nd bag (~$80)</option>
-              </optgroup>
-              <optgroup label="── Add a 3rd Bag ──">
-                <option value="brussels_3">Brussels Airlines + 3rd bag ($100) = 69kg</option>
-                <option value="delta_3">Delta Air Lines + 3rd bag ($150) = 69kg</option>
-                <option value="united_3">United Airlines + 3rd bag ($150) = 69kg</option>
-                <option value="other_3">Other Airline + 3rd bag (~$150) = 69kg</option>
-              </optgroup>
-              <optgroup label="── Add a 4th Bag (Max Cargo) ──">
-                <option value="brussels_4">Brussels Airlines + 3rd &amp; 4th bag ($200) = 92kg</option>
-                <option value="delta_4">Delta Air Lines + 3rd &amp; 4th bag ($300) = 92kg</option>
-                <option value="united_4">United Airlines + 3rd &amp; 4th bag ($300) = 92kg</option>
-                <option value="other_4">Other Airline + 3rd &amp; 4th bag (~$300) = 92kg</option>
-              </optgroup>
+              <option value="brussels">Brussels Airlines — extra bag $100</option>
+              <option value="delta">Delta Air Lines — extra bag $200</option>
+              <option value="united">United Airlines — extra bag $150</option>
+              <option value="other100">Other Airline — extra bag $100</option>
+              <option value="other150">Other Airline — extra bag $150</option>
+              <option value="other200">Other Airline — extra bag $200</option>
             </select>
           </div>
           <div class="calc-field">
-            <label>Your Fee per kg (USD $)</label>
+            <label>Your Rate per kg (USD $)</label>
             <select id="calc-rate" onchange="calcEarnings()">
-              <option value="8">$8 / kg — Budget rate</option>
-              <option value="10">$10 / kg — Standard rate</option>
-              <option value="12" selected>$12 / kg — Mid range</option>
-              <option value="15">$15 / kg — Premium rate</option>
-              <option value="18">$18 / kg — Express rate</option>
+              <option value="8">$8 / kg</option>
+              <option value="10">$10 / kg</option>
+              <option value="12" selected>$12 / kg</option>
+              <option value="15">$15 / kg</option>
+              <option value="18">$18 / kg</option>
             </select>
           </div>
         </div>
-        <div class="calc-field" style="margin-bottom:16px;">
-          <label>Cargo Weight Available (kg) — <span id="slider-display" class="slider-val">25 <span>kg reserved for senders</span></span></label>
-          <input type="range" id="calc-kg" min="5" max="92" value="25" step="1" oninput="calcEarnings()"/>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px;"><span>5 kg min</span><span>92 kg max (4 bags)</span></div>
+
+        <div class="calc-field" style="margin-bottom:18px;">
+          <label>How much of the extra bag do you fill? &nbsp;—&nbsp; <span id="slider-display" class="slider-val">20 <span>kg</span></span></label>
+          <input type="range" id="calc-kg" min="1" max="23" value="20" step="1" oninput="calcEarnings()"/>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px;">
+            <span>1 kg</span>
+            <span>23 kg (full bag)</span>
+          </div>
         </div>
 
-        <div class="earnings-result" id="earnings-result">
+        <div class="earnings-result">
           <div class="earnings-result-grid" id="earnings-grid"></div>
           <div class="earnings-breakdown" id="earnings-breakdown"></div>
           <div class="airline-note" id="airline-note"></div>
@@ -879,7 +903,11 @@ function buildCard(p,today){
         ${p.notes?`<div class="listing-notes">${esc(p.notes)}</div>`:''}
       </div>
       <div class="listing-right">
-        <div class="fee-badge"><div class="fee-amount">$${p.fee_per_kg}</div><div class="fee-unit">per kg</div></div>
+        <div class="fee-badge">
+          <div class="fee-amount">$${p.fee_per_kg}</div>
+          <div class="fee-unit">per kg</div>
+          <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(232,160,32,0.2);font-size:11px;color:var(--accent);font-weight:700;">🧳 $175 entire bag</div>
+        </div>
         <div>
           <a href="https://www.dhl.com/us-en/home/get-a-quote.html" target="_blank" class="dhl-compare">vs <span class="dhl-logo">DHL</span> rates ↗</a>
           <button class="book-btn" onclick="openBooking(${p.id}, '${esc(p.name)}', ${p.fee_per_kg}, ${p.max_kg})">🔒 Book &amp; Pay Securely</button>
@@ -931,6 +959,18 @@ let stripeCard     = null;
 let currentBooking = { post_id: null, traveler_name: '', fee_per_kg: 0, max_kg: 0 };
 let activeBookingId = null;
 
+const FLAT_BAG_FEE = 175; // Flat fee for entire extra bag
+let bookingType = 'kg'; // 'kg' or 'bag'
+
+function setBookingType(type) {
+  bookingType = type;
+  document.getElementById('weight-field').style.display = type === 'kg' ? 'flex' : 'none';
+  document.getElementById('bag-field').style.display    = type === 'bag' ? 'block' : 'none';
+  document.getElementById('type-btn-kg').classList.toggle('type-btn-active',  type === 'kg');
+  document.getElementById('type-btn-bag').classList.toggle('type-btn-active', type === 'bag');
+  updateBookingSummary();
+}
+
 function initStripe() {
   if (typeof Stripe === 'undefined') return;
   stripeInstance = Stripe(STRIPE_PK);
@@ -947,6 +987,7 @@ function openBooking(post_id, traveler_name, fee_per_kg, max_kg) {
   document.getElementById('bk-phone').value  = '';
   document.getElementById('bk-desc').value   = '';
   document.getElementById('bk-contract-agree').checked = false;
+  setBookingType('kg'); // reset to per-kg mode
   document.getElementById('booking-summary').innerHTML = `
     <div class="booking-summary-row"><span>Traveler</span><span>${traveler_name}</span></div>
     <div class="booking-summary-row"><span>Rate</span><span>$${fee_per_kg}/kg</span></div>
@@ -976,17 +1017,28 @@ function closeBooking() {
 }
 
 function updateBookingSummary() {
-  const w   = parseFloat(document.getElementById('bk-weight').value) || 0;
   const fee = currentBooking.fee_per_kg;
-  const sub = (w * fee).toFixed(2);
-  const com = (w * fee * 0.10).toFixed(2);
-  const tot = (w * fee).toFixed(2);
-  document.getElementById('booking-summary').innerHTML = `
-    <div class="booking-summary-row"><span>Traveler</span><span>${currentBooking.traveler_name}</span></div>
-    <div class="booking-summary-row"><span>${w} kg × $${fee}/kg</span><span>$${sub}</span></div>
-    <div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${com}</span></div>
-    <div class="booking-summary-row"><span>Traveler receives</span><span>$${(sub - com).toFixed(2)}</span></div>
-    <div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${tot}</b></span></div>`;
+  if (bookingType === 'bag') {
+    const total = FLAT_BAG_FEE;
+    const com   = (total * 0.10).toFixed(2);
+    document.getElementById('booking-summary').innerHTML = `
+      <div class="booking-summary-row"><span>Traveler</span><span>${currentBooking.traveler_name}</span></div>
+      <div class="booking-summary-row"><span>Booking type</span><span style="color:var(--accent)">🧳 Entire Extra Bag (up to 23kg)</span></div>
+      <div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${com}</span></div>
+      <div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${total.toFixed(2)}</b></span></div>`;
+  } else {
+    const w   = parseFloat(document.getElementById('bk-weight').value) || 0;
+    const sub = (w * fee).toFixed(2);
+    const com = (w * fee * 0.10).toFixed(2);
+    document.getElementById('booking-summary').innerHTML = `
+      <div class="booking-summary-row"><span>Traveler</span><span>${currentBooking.traveler_name}</span></div>
+      <div class="booking-summary-row"><span>Rate</span><span>$${fee}/kg</span></div>
+      ${w > 0 ? `
+      <div class="booking-summary-row"><span>${w} kg × $${fee}/kg</span><span>$${sub}</span></div>
+      <div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${com}</span></div>
+      <div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${sub}</b></span></div>`
+      : `<div class="booking-summary-row total"><span>Enter weight above to see total</span><span></span></div>`}`;
+  }
 }
 
 // ── PROCESS PAYMENT ───────────────────────────────────────
@@ -995,12 +1047,14 @@ async function processPayment() {
   const email  = document.getElementById('bk-email').value.trim();
   const phone  = document.getElementById('bk-phone').value.trim();
   const desc   = document.getElementById('bk-desc').value.trim();
-  const weight = parseFloat(document.getElementById('bk-weight').value);
 
-  if (!name || !email || !weight || weight <= 0) {
-    showToast('Please fill in all required fields.', true); return;
-  }
-  if (weight > currentBooking.max_kg) {
+  // Determine weight and amount based on booking type
+  const isBag  = bookingType === 'bag';
+  const weight = isBag ? 23 : parseFloat(document.getElementById('bk-weight').value);
+
+  if (!name || !email) { showToast('Please fill in your name and email.', true); return; }
+  if (!isBag && (!weight || weight <= 0)) { showToast('Please enter the package weight.', true); return; }
+  if (!isBag && weight > currentBooking.max_kg) {
     showToast(`Max weight for this traveler is ${currentBooking.max_kg} kg.`, true); return;
   }
   if (!document.getElementById('bk-contract-agree').checked) {
@@ -1017,12 +1071,14 @@ async function processPayment() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        post_id: currentBooking.post_id,
-        sender_name: name,
-        sender_email: email,
-        sender_phone: phone,
+        post_id:             currentBooking.post_id,
+        sender_name:         name,
+        sender_email:        email,
+        sender_phone:        phone,
         package_description: desc,
-        weight_kg: weight,
+        weight_kg:           weight,
+        booking_type:        bookingType,        // 'kg' or 'bag'
+        flat_fee:            isBag ? FLAT_BAG_FEE : null,
       })
     });
 
@@ -1201,86 +1257,57 @@ async function setupPayouts(post_id, traveler_name, traveler_email) {
 
 // ─── EARNINGS CALCULATOR ──────────────────────────────────
 const AIRLINE_DATA = {
-  // ── 2 FREE BAGS ──
-  brussels:    { name:'Brussels Airlines',  bagFee:0,   freeBags:2, extraBags:0, totalBags:2, maxKg:46, note:'<strong>Best option!</strong> Brussels Airlines includes <strong>2 free bags × 23kg = 46kg</strong> on all US–Africa routes. Zero bag cost = maximum earnings.' },
-  delta:       { name:'Delta Air Lines',    bagFee:0,   freeBags:2, extraBags:0, totalBags:2, maxKg:46, note:'<strong>Great option.</strong> Delta includes <strong>2 free bags × 23kg = 46kg</strong> on US–Africa long-haul routes in Economy.' },
-  united_free: { name:'United Airlines',    bagFee:0,   freeBags:2, extraBags:0, totalBags:2, maxKg:46, note:'<strong>Good option.</strong> United includes <strong>2 free bags × 23kg = 46kg</strong> on long-haul Africa routes. Confirm your ticket includes 2 free bags.' },
-  other_free:  { name:'Your Airline',       bagFee:0,   freeBags:2, extraBags:0, totalBags:2, maxKg:46, note:'<strong>Check your ticket.</strong> Many airlines include <strong>2 free bags × 23kg = 46kg</strong> to Africa. Confirm with your airline before posting.' },
-  // ── 1 FREE + PAID 2ND ──
-  united_pay:  { name:'United Airlines',    bagFee:55,  freeBags:1, extraBags:1, totalBags:2, maxKg:46, note:'<strong>Still profitable.</strong> 1 free bag (23kg) + 1 extra ($55) = <strong>46kg total</strong>. Every $55 spent earns back ~$168 net — a 2× return.' },
-  other_pay:   { name:'Your Airline',       bagFee:80,  freeBags:1, extraBags:1, totalBags:2, maxKg:46, note:'<strong>Still worth it.</strong> 1 free bag (23kg) + 1 extra (~$80) = <strong>46kg total</strong>. Even after fees you still pocket significant earnings.' },
-  // ── 3RD BAG ──
-  brussels_3:  { name:'Brussels Airlines',  bagFee:100, freeBags:2, extraBags:1, totalBags:3, maxKg:69, note:'<strong>Power move!</strong> 2 free bags + 1 extra ($100) = <strong>69kg total</strong>. The 3rd bag costs $100 but adds ~23kg of earning capacity — you net ~$147 extra per trip.' },
-  delta_3:     { name:'Delta Air Lines',    bagFee:150, freeBags:2, extraBags:1, totalBags:3, maxKg:69, note:'<strong>Strong option.</strong> 2 free bags + 1 extra ($150) = <strong>69kg total</strong>. The 3rd bag costs $150 — at $12/kg you earn back ~$248 from that extra bag alone.' },
-  united_3:    { name:'United Airlines',    bagFee:150, freeBags:2, extraBags:1, totalBags:3, maxKg:69, note:'<strong>Worth it.</strong> 2 free bags + 1 extra ($150) = <strong>69kg total</strong>. At $12/kg the 3rd bag earns ~$248 gross — well above the $150 fee.' },
-  other_3:     { name:'Your Airline',       bagFee:150, freeBags:2, extraBags:1, totalBags:3, maxKg:69, note:'<strong>Check with your airline.</strong> 2 free bags + 1 extra (~$150) = <strong>69kg total</strong>. 3rd bag fees vary — confirm before booking.' },
-  // ── 4TH BAG (MAX CARGO) ──
-  brussels_4:  { name:'Brussels Airlines',  bagFee:200, freeBags:2, extraBags:2, totalBags:4, maxKg:92, note:'<strong>Maximum earnings!</strong> 2 free + 3rd ($100) + 4th ($100) = <strong>92kg total</strong>. Total bag fees: $200. At $12/kg the extra 46kg earns ~$496 gross — a massive 2.5× return on bag fees.' },
-  delta_4:     { name:'Delta Air Lines',    bagFee:300, freeBags:2, extraBags:2, totalBags:4, maxKg:92, note:'<strong>Max cargo mode.</strong> 2 free + 3rd ($150) + 4th ($150) = <strong>92kg total</strong>. Total bag fees: $300. At $12/kg extra 46kg earns ~$496 gross — still a strong return.' },
-  united_4:    { name:'United Airlines',    bagFee:300, freeBags:2, extraBags:2, totalBags:4, maxKg:92, note:'<strong>Max cargo mode.</strong> 2 free + 3rd ($150) + 4th ($150) = <strong>92kg total</strong>. Total bag fees: $300. Extra 46kg earns ~$496 gross at $12/kg.' },
-  other_4:     { name:'Your Airline',       bagFee:300, freeBags:2, extraBags:2, totalBags:4, maxKg:92, note:'<strong>Check fees carefully.</strong> 2 free + 3rd + 4th = <strong>92kg total</strong>. Bag fees vary widely by airline. Confirm exact costs before booking.' },
+  brussels: { name:'Brussels Airlines', bagFee:100 },
+  delta:    { name:'Delta Air Lines',   bagFee:200 },
+  united:   { name:'United Airlines',   bagFee:150 },
+  other100: { name:'Your Airline',      bagFee:100 },
+  other150: { name:'Your Airline',      bagFee:150 },
+  other200: { name:'Your Airline',      bagFee:200 },
 };
 
 function calcEarnings() {
   const airline  = document.getElementById('calc-airline').value;
   const rate     = parseFloat(document.getElementById('calc-rate').value);
+  const kg       = parseInt(document.getElementById('calc-kg').value);
   const data     = AIRLINE_DATA[airline];
+  const bagFee   = data.bagFee;
 
-  // Cap slider to airline's max kg
-  const slider = document.getElementById('calc-kg');
-  if (parseInt(slider.max) !== data.maxKg) {
-    slider.max = data.maxKg;
-    if (parseInt(slider.value) > data.maxKg) slider.value = data.maxKg;
-  }
-  const kg = parseInt(slider.value);
-
-  // Update slider label and range hint
   document.getElementById('slider-display').innerHTML =
-    `${kg} <span>kg reserved for senders</span>`;
-  slider.nextElementSibling.innerHTML =
-    `<span>5 kg min</span><span>${data.maxKg} kg max (${data.totalBags} bag${data.totalBags>1?'s':''})</span>`;
+    `${kg} <span>kg</span>`;
 
   const gross      = kg * rate;
   const commission = gross * 0.10;
   const stripeFee  = gross * 0.029 + 0.30;
-  const bagFee     = data.bagFee;
-  const net        = gross - commission - stripeFee - bagFee;
-  const perKgNet   = net / kg;
-
-  // Build bag fee breakdown string
-  let bagFeeRow = '';
-  if (bagFee === 0) {
-    bagFeeRow = `<div class="earnings-breakdown-row"><span>Checked bag fees</span><span style="color:var(--green)">FREE ✓ (${data.freeBags} bags included)</span></div>`;
-  } else if (data.extraBags === 1) {
-    bagFeeRow = `<div class="earnings-breakdown-row deduct"><span>Extra bag fee (bag ${data.freeBags + 1})</span><span>-$${bagFee.toFixed(2)}</span></div>`;
-  } else {
-    bagFeeRow = `<div class="earnings-breakdown-row deduct"><span>Extra bag fees (bags ${data.freeBags+1} &amp; ${data.totalBags})</span><span>-$${bagFee.toFixed(2)}</span></div>`;
-  }
+  const totalCost  = bagFee + commission + stripeFee;
+  const net        = gross - totalCost;
+  const isProfit   = net > 0;
+  const roi        = bagFee > 0 ? ((net / bagFee) * 100).toFixed(0) : 0;
 
   document.getElementById('earnings-grid').innerHTML = `
+    <div class="earnings-result-item">
+      <div class="val">$${bagFee}</div>
+      <div class="lbl">Bag Fee You Pay</div>
+    </div>
     <div class="earnings-result-item">
       <div class="val">$${gross.toFixed(0)}</div>
       <div class="lbl">Gross Earnings</div>
     </div>
-    <div class="earnings-result-item deduct">
-      <div class="val">-$${(commission + stripeFee + bagFee).toFixed(0)}</div>
-      <div class="lbl">Total Deductions</div>
-    </div>
-    <div class="earnings-result-item highlight">
-      <div class="val">$${Math.max(0, net).toFixed(0)}</div>
-      <div class="lbl">Your Net Earnings</div>
+    <div class="earnings-result-item ${isProfit ? 'highlight' : 'deduct'}">
+      <div class="val">${isProfit ? '+' : ''}$${net.toFixed(0)}</div>
+      <div class="lbl">${isProfit ? 'Your Net Profit' : 'Net Loss'}</div>
     </div>`;
 
   document.getElementById('earnings-breakdown').innerHTML = `
-    <div class="earnings-breakdown-row"><span>Bag allowance</span><span style="color:var(--green)">${data.freeBags} free${data.extraBags > 0 ? ` + ${data.extraBags} paid` : ''} = ${data.totalBags} bag${data.totalBags>1?'s':''} × 23kg = ${data.maxKg}kg total</span></div>
-    <div class="earnings-breakdown-row"><span>${kg} kg × $${rate}/kg</span><span>$${gross.toFixed(2)}</span></div>
-    <div class="earnings-breakdown-row comm"><span>AfriCarryApp commission (10%)</span><span>-$${commission.toFixed(2)}</span></div>
-    <div class="earnings-breakdown-row deduct"><span>Stripe processing fee (2.9% + $0.30)</span><span>-$${stripeFee.toFixed(2)}</span></div>
-    ${bagFeeRow}
-    <div class="earnings-breakdown-row net"><span>💰 Your net earnings</span><span>$${Math.max(0, net).toFixed(2)}</span></div>
-    <div class="earnings-breakdown-row"><span>That is $${Math.max(0, perKgNet).toFixed(2)} per kg carried</span><span></span></div>`;
+    <div class="earnings-breakdown-row"><span>Extra bag fee (paid to airline)</span><span class="deduct" style="color:var(--red)">-$${bagFee.toFixed(2)}</span></div>
+    <div class="earnings-breakdown-row"><span>${kg} kg × $${rate}/kg (sender pays you)</span><span>$${gross.toFixed(2)}</span></div>
+    <div class="earnings-breakdown-row comm"><span>AfriCarryApp commission (10%)</span><span style="color:var(--accent)">-$${commission.toFixed(2)}</span></div>
+    <div class="earnings-breakdown-row deduct"><span>Stripe processing fee</span><span style="color:var(--red)">-$${stripeFee.toFixed(2)}</span></div>
+    <div class="earnings-breakdown-row net"><span>💰 Net profit from extra bag</span><span>${isProfit ? '+' : ''}$${net.toFixed(2)}</span></div>
+    ${isProfit ? `<div class="earnings-breakdown-row"><span>Return on bag fee</span><span style="color:var(--green);font-weight:700;">${roi}% ROI — every $${bagFee} spent earns $${net.toFixed(0)} back</span></div>` : `<div class="earnings-breakdown-row"><span>💡 Tip: fill more kg or raise your rate to profit</span><span></span></div>`}`;
 
-  document.getElementById('airline-note').innerHTML = data.note;
+  document.getElementById('airline-note').innerHTML = isProfit
+    ? `<strong>Worth it!</strong> Buying the extra bag costs you $${bagFee} and earns you <strong>$${net.toFixed(2)} net profit</strong> on this trip. That is a ${roi}% return on your bag fee — just from filling ${kg}kg of one extra bag.`
+    : `<strong>Not profitable yet</strong> at ${kg}kg. Try filling more of the bag or raising your rate per kg. You need at least <strong>${Math.ceil((bagFee + 5) / (rate * 0.87))}kg</strong> at $${rate}/kg to break even on the $${bagFee} bag fee.`;
 }
 
 function toggleCalc() {
@@ -1306,6 +1333,7 @@ window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOSt
 </script>
 </body>
 </html>
+
 
  
  
