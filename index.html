@@ -133,6 +133,12 @@
   .payment-field input:focus { outline:none; border-color:var(--green); }
   #stripe-card-element { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:13px 14px; }
   .escrow-note { background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:8px; padding:10px 14px; font-size:12px; color:var(--green); margin:12px 0; line-height:1.5; }
+  .contract-box { background:rgba(232,160,32,0.04); border:1px solid rgba(232,160,32,0.2); border-radius:10px; padding:14px 16px; margin:12px 0; font-size:12px; color:var(--muted); line-height:1.6; }
+  .contract-box h4 { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:8px; text-transform:uppercase; letter-spacing:.04em; }
+  .contract-box ol { padding-left:16px; display:flex; flex-direction:column; gap:4px; }
+  .contract-agree { display:flex; align-items:flex-start; gap:10px; margin:10px 0; }
+  .contract-agree input[type=checkbox] { width:16px; height:16px; flex-shrink:0; margin-top:2px; accent-color:var(--green); cursor:pointer; }
+  .contract-agree label { font-size:12px; color:var(--muted); line-height:1.5; cursor:pointer; }
   .btn-pay { background:var(--green); color:#fff; border:none; padding:14px; border-radius:10px; font-weight:700; font-size:15px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; width:100%; margin-top:8px; }
   .btn-pay:hover { background:#0d9e6e; }
   .btn-pay:disabled { opacity:.5; cursor:not-allowed; }
@@ -146,6 +152,8 @@
   .payout-ready { display:inline-flex; align-items:center; gap:4px; font-size:11px; background:rgba(16,185,129,0.12); color:var(--green); border:1px solid rgba(16,185,129,0.3); padding:3px 8px; border-radius:4px; font-weight:600; }
   .payout-pending { display:inline-flex; align-items:center; gap:4px; font-size:11px; background:rgba(232,160,32,0.12); color:var(--accent); border:1px solid rgba(232,160,32,0.3); padding:3px 8px; border-radius:4px; font-weight:600; }
   .dhl-logo { font-weight:800; color:#FFCC00; font-size:12px; }
+  .dhl-compare { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); text-decoration:none; transition:color .2s; margin-top:4px; }
+  .dhl-compare:hover { color:#FFCC00; }
 
   /* ── RATINGS DISPLAY ── */
   .stars-display { display:inline-flex; gap:2px; align-items:center; }
@@ -189,6 +197,50 @@
   .btn-rv { background:var(--accent); color:#000; border:none; padding:9px 22px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
   .btn-rv:hover { background:#f0b030; }
   .btn-rv:disabled { opacity:.5; cursor:not-allowed; }
+
+  /* ── EARNINGS CALCULATOR ── */
+  .earnings-calc { background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(16,185,129,0.05)); border:1px solid rgba(232,160,32,0.25); border-radius:16px; padding:28px 32px; margin-bottom:28px; }
+  .earnings-calc-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+  .earnings-calc-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; }
+  .earnings-calc-title span { color:var(--accent); }
+  .earnings-toggle-btn { background:transparent; border:1px solid var(--border); color:var(--muted); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
+  .earnings-toggle-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .earnings-body.collapsed { display:none; }
+  .calc-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .calc-field { display:flex; flex-direction:column; gap:6px; }
+  .calc-field label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+  .calc-field select { background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); padding:10px 14px; font-size:14px; font-family:'DM Sans',sans-serif; cursor:pointer; }
+  .calc-field select:focus { outline:none; border-color:var(--accent); }
+  .slider-val { font-size:22px; font-weight:700; color:var(--accent); font-family:'Playfair Display',serif; }
+  .slider-val span { font-size:13px; color:var(--muted); font-family:'DM Sans',sans-serif; font-weight:400; }
+  input[type=range] { -webkit-appearance:none; width:100%; height:6px; border-radius:3px; background:var(--border); outline:none; cursor:pointer; margin-top:6px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--accent); cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.3); }
+  input[type=range]::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:var(--accent); cursor:pointer; border:none; }
+  .earnings-result { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-top:16px; }
+  .earnings-result-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px; }
+  .earnings-result-item { text-align:center; padding:12px; background:var(--surface); border-radius:10px; border:1px solid var(--border); }
+  .earnings-result-item .val { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; margin-bottom:2px; }
+  .earnings-result-item .lbl { font-size:11px; color:var(--muted); }
+  .earnings-result-item.highlight { border-color:rgba(16,185,129,0.4); background:rgba(16,185,129,0.06); }
+  .earnings-result-item.highlight .val { color:var(--green); }
+  .earnings-result-item.deduct .val { color:var(--red); }
+  .earnings-result-item.commission .val { color:var(--accent); }
+  .earnings-breakdown { display:flex; flex-direction:column; gap:6px; padding-top:14px; border-top:1px solid var(--border); }
+  .earnings-breakdown-row { display:flex; justify-content:space-between; font-size:13px; }
+  .earnings-breakdown-row span:first-child { color:var(--muted); }
+  .earnings-breakdown-row span:last-child { font-weight:600; }
+  .earnings-breakdown-row.net span { color:var(--green); font-size:15px; }
+  .earnings-breakdown-row.deduct span:last-child { color:var(--red); }
+  .earnings-breakdown-row.comm span:last-child { color:var(--accent); }
+  .airline-note { font-size:12px; color:var(--muted); margin-top:10px; padding:10px 14px; background:rgba(232,160,32,0.05); border:1px solid rgba(232,160,32,0.15); border-radius:8px; line-height:1.5; }
+  .airline-note strong { color:var(--accent); }
+  .cta-post-now { background:var(--accent); color:#000; border:none; padding:12px 28px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; width:100%; margin-top:14px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .cta-post-now:hover { background:#f0b030; transform:translateY(-1px); }
+  @media(max-width:640px) {
+    .calc-row { grid-template-columns:1fr; }
+    .earnings-result-grid { grid-template-columns:1fr 1fr; }
+    .earnings-calc { padding:20px 16px; }
+  }
 
   /* ── LEGAL MODAL ── */
   .modal.legal { max-width:700px; }
@@ -271,6 +323,22 @@
     <div class="payment-field"><label>Package Description</label><input type="text" id="bk-desc" placeholder="e.g. Clothing, documents, vitamins"/></div>
     <div class="payment-field"><label>Weight (kg)</label><input type="number" id="bk-weight" placeholder="e.g. 3" min="0.5" max="30" step="0.5" oninput="updateBookingSummary()"/></div>
     <div class="escrow-note">🔒 Your payment is held in escrow. The traveler only receives payment after you confirm delivery. You have 48 hours to raise a dispute.</div>
+    <div class="contract-box">
+      <h4>📄 Shipping Agreement — Summary</h4>
+      <ol>
+        <li>Sender confirms all items comply with US, Liberian, and international customs laws.</li>
+        <li>Traveler agrees to carry the package safely and deliver it to the recipient.</li>
+        <li>Payment is held in escrow by AfriCarryApp until delivery is confirmed by the sender.</li>
+        <li>Sender has 48 hours after expected delivery to raise a dispute.</li>
+        <li>Neither party may transport prohibited items as listed in AfriCarryApp Terms of Use.</li>
+        <li>AfriCarryApp retains a 10% platform commission from the total shipment fee.</li>
+        <li>This agreement is legally binding upon payment confirmation.</li>
+      </ol>
+    </div>
+    <div class="contract-agree">
+      <input type="checkbox" id="bk-contract-agree"/>
+      <label for="bk-contract-agree">I have read and agree to the <strong>Shipping Agreement</strong> above. I confirm my package contents are legal and comply with all customs laws. I understand this is a binding contract.</label>
+    </div>
     <div class="payment-field"><label>Card Details</label>
       <div id="stripe-card-element"></div>
       <div id="stripe-card-errors" style="color:var(--red);font-size:12px;margin-top:6px;"></div>
@@ -280,7 +348,20 @@
   </div>
 </div>
 
-<!-- CONFIRM DELIVERY MODAL -->
+<!-- CONTRACT VIEWER MODAL -->
+<div class="modal-overlay" id="contract-modal">
+  <div class="modal" style="max-width:620px;">
+    <h2>📄 Shipping Contract</h2>
+    <p>Official AfriCarryApp digital shipping agreement for this booking.</p>
+    <div id="contract-content" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;font-size:12px;line-height:1.7;color:var(--muted);margin-bottom:16px;"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeContract()">Close</button>
+      <button class="btn-save" onclick="printContract()">🖨 Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal-overlay" id="confirm-modal">
   <div class="modal">
     <h2>✅ Confirm Delivery</h2>
@@ -430,6 +511,7 @@
 </div>
 
 
+<header>
   <div class="logo">
     <svg width="36" height="24" viewBox="0 0 36 24" style="border-radius:4px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.4)">
       <rect width="36" height="24" fill="#BF0000"/>
@@ -476,7 +558,69 @@
   <section id="post-section">
     <h2 class="section-title">Post Your Trip</h2>
     <p class="section-sub">Flying to Liberia? Let the community know — earn extra on your journey.</p>
-    <div class="post-form">
+
+    <!-- EARNINGS CALCULATOR -->
+    <div class="earnings-calc">
+      <div class="earnings-calc-header">
+        <div class="earnings-calc-title">💰 How Much Can You <span>Earn?</span></div>
+        <button class="earnings-toggle-btn" id="calc-toggle" onclick="toggleCalc()">▲ Hide Calculator</button>
+      </div>
+      <div class="earnings-body" id="earnings-body">
+        <div class="calc-row">
+          <div class="calc-field">
+            <label>Your Airline</label>
+            <select id="calc-airline" onchange="calcEarnings()">
+              <optgroup label="── 2 Free Bags (Standard) ──">
+                <option value="brussels">Brussels Airlines — 2 free bags (46kg)</option>
+                <option value="delta">Delta Air Lines — 2 free bags (46kg)</option>
+                <option value="united_free">United Airlines — 2 free bags (46kg)</option>
+                <option value="other_free">Other Airline — 2 free bags (46kg)</option>
+              </optgroup>
+              <optgroup label="── 1 Free + Buy Extra Bags ──">
+                <option value="united_pay">United Airlines — 1 free + buy 2nd bag ($55)</option>
+                <option value="other_pay">Other Airline — 1 free + buy 2nd bag (~$80)</option>
+              </optgroup>
+              <optgroup label="── Add a 3rd Bag ──">
+                <option value="brussels_3">Brussels Airlines + 3rd bag ($100) = 69kg</option>
+                <option value="delta_3">Delta Air Lines + 3rd bag ($150) = 69kg</option>
+                <option value="united_3">United Airlines + 3rd bag ($150) = 69kg</option>
+                <option value="other_3">Other Airline + 3rd bag (~$150) = 69kg</option>
+              </optgroup>
+              <optgroup label="── Add a 4th Bag (Max Cargo) ──">
+                <option value="brussels_4">Brussels Airlines + 3rd &amp; 4th bag ($200) = 92kg</option>
+                <option value="delta_4">Delta Air Lines + 3rd &amp; 4th bag ($300) = 92kg</option>
+                <option value="united_4">United Airlines + 3rd &amp; 4th bag ($300) = 92kg</option>
+                <option value="other_4">Other Airline + 3rd &amp; 4th bag (~$300) = 92kg</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="calc-field">
+            <label>Your Fee per kg (USD $)</label>
+            <select id="calc-rate" onchange="calcEarnings()">
+              <option value="8">$8 / kg — Budget rate</option>
+              <option value="10">$10 / kg — Standard rate</option>
+              <option value="12" selected>$12 / kg — Mid range</option>
+              <option value="15">$15 / kg — Premium rate</option>
+              <option value="18">$18 / kg — Express rate</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-field" style="margin-bottom:16px;">
+          <label>Cargo Weight Available (kg) — <span id="slider-display" class="slider-val">25 <span>kg reserved for senders</span></span></label>
+          <input type="range" id="calc-kg" min="5" max="92" value="25" step="1" oninput="calcEarnings()"/>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px;"><span>5 kg min</span><span>92 kg max (4 bags)</span></div>
+        </div>
+
+        <div class="earnings-result" id="earnings-result">
+          <div class="earnings-result-grid" id="earnings-grid"></div>
+          <div class="earnings-breakdown" id="earnings-breakdown"></div>
+          <div class="airline-note" id="airline-note"></div>
+        </div>
+
+        <button class="cta-post-now" onclick="scrollToForm()">✈ Post Your Trip &amp; Start Earning →</button>
+      </div>
+    </div>
+    <div class="post-form" id="post-form-section">
       <div class="form-grid">
         <div class="field"><label>Your Name</label><input type="text" id="f-name" placeholder="Full name"/></div>
         <div class="field"><label>Contact (Email or WhatsApp)</label><input type="text" id="f-contact" placeholder="email@example.com or +1 xxx xxx xxxx"/></div>
@@ -536,8 +680,7 @@
     <a onclick="openConfirmDelivery()" style="cursor:pointer">✅ Confirm Delivery</a>
     <a onclick="openLegal()">🚫 Prohibited Items</a>
     <a href="https://www.dhl.com/us-en/home/get-a-quote.html" target="_blank">DHL Rate Calculator</a>
-    <a onclick="openConfig()">⚙️ Connect Supabase</a>
-  </div>
+    <a onclick="openConfig()">⚙️ Connect Supabase</a>  </div>
   <div class="footer-copy">© 2026 AfriCarryApp. All rights reserved. Users are solely responsible for customs compliance.</div>
 </footer>
 
@@ -545,8 +688,6 @@
 
 <script>
 const SB_URL_K = 'll_sb_url', SB_KEY_K = 'll_sb_key';
-const DEFAULT_SB_URL = 'https://dnqruxabikiwoqoqyrmv.supabase.co';
-const DEFAULT_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRucXJ1eGFiaWtpd29xb3F5cm12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNDg4OTMsImV4cCI6MjA5MjkyNDg5M30.ZjeSz1UXbOxoWeR4F15cS0FANOy9s9bsLinCf6w9orE';
 let sb = null, curFilter = 'all', posts = [], reviews = {};
 
 /* ── DEMO DATA ── */
@@ -574,10 +715,21 @@ const DEMO_R = {
 
 /* ── SUPABASE ── */
 function initSB(){
-  if(!localStorage.getItem(SB_URL_K)) localStorage.setItem(SB_URL_K, DEFAULT_SB_URL);
-  if(!localStorage.getItem(SB_KEY_K)) localStorage.setItem(SB_KEY_K, DEFAULT_SB_KEY);
   const u=localStorage.getItem(SB_URL_K), k=localStorage.getItem(SB_KEY_K);
-  if(u&&k){try{sb=window.supabase.createClient(u,k);document.getElementById('setup-banner').innerHTML=`<span><span class="status-dot active"></span>Connected to Supabase — Live data active</span><button onclick="openConfig()">⚙️ Reconfigure</button>`;return true;}catch(e){}}
+  if(u&&k){try{sb=window.supabase.createClient(u,k);document.getElementById('setup-banner').style.display='none';return true;}catch(e){}}
+  // Fetch credentials from secure backend
+  fetch('/api/config')
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.url&&d.key){
+        localStorage.setItem(SB_URL_K,d.url);
+        localStorage.setItem(SB_KEY_K,d.key);
+        sb=window.supabase.createClient(d.url,d.key);
+        document.getElementById('setup-banner').style.display='none';
+        loadAll();
+      }
+    })
+    .catch(()=>{}); // Falls back to demo mode if backend not available
   return false;
 }
 function openLegal(){document.getElementById('legal-modal').classList.add('open');}
@@ -794,6 +946,7 @@ function openBooking(post_id, traveler_name, fee_per_kg, max_kg) {
   document.getElementById('bk-email').value  = '';
   document.getElementById('bk-phone').value  = '';
   document.getElementById('bk-desc').value   = '';
+  document.getElementById('bk-contract-agree').checked = false;
   document.getElementById('booking-summary').innerHTML = `
     <div class="booking-summary-row"><span>Traveler</span><span>${traveler_name}</span></div>
     <div class="booking-summary-row"><span>Rate</span><span>$${fee_per_kg}/kg</span></div>
@@ -849,6 +1002,9 @@ async function processPayment() {
   }
   if (weight > currentBooking.max_kg) {
     showToast(`Max weight for this traveler is ${currentBooking.max_kg} kg.`, true); return;
+  }
+  if (!document.getElementById('bk-contract-agree').checked) {
+    showToast('Please read and agree to the Shipping Agreement to continue.', true); return;
   }
 
   const btn = document.getElementById('btn-pay');
@@ -960,7 +1116,73 @@ async function submitDispute() {
   }
 }
 
-// ── TRAVELER PAYOUT SETUP ─────────────────────────────────
+// ── CONTRACT VIEWER ───────────────────────────────────────
+function closeContract() { document.getElementById('contract-modal').classList.remove('open'); }
+
+async function viewContract(booking_id, email) {
+  document.getElementById('contract-content').innerHTML = '<div class="spinner"></div>';
+  document.getElementById('contract-modal').classList.add('open');
+  try {
+    const res = await fetch(`/api/contract?booking_id=${booking_id}&email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    const c = data.contract;
+    document.getElementById('contract-content').innerHTML = `
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:18px;font-weight:700;color:var(--accent);">AfriCarryApp</div>
+        <div style="font-size:11px;color:var(--muted);">OFFICIAL SHIPPING AGREEMENT</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">Reference: ${c.reference}</div>
+      </div>
+      <hr style="border-color:var(--border);margin:12px 0;"/>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr><td style="padding:4px 8px;color:var(--muted);width:45%;">Booking ID</td><td style="padding:4px 8px;font-weight:600;color:var(--text);">#${c.booking_id}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Date Booked</td><td style="padding:4px 8px;font-weight:600;color:var(--text);">${c.booked_at}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Status</td><td style="padding:4px 8px;font-weight:600;color:var(--green);text-transform:uppercase;">${c.status}</td></tr>
+        <tr><td colspan="2" style="padding:8px;background:rgba(255,255,255,0.03);font-weight:700;color:var(--accent);">TRAVELER</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Name</td><td style="padding:4px 8px;color:var(--text);">${c.traveler_name}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Route</td><td style="padding:4px 8px;color:var(--text);">${c.traveler_origin} → ${c.traveler_destination}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Travel Date</td><td style="padding:4px 8px;color:var(--text);">${c.travel_date}</td></tr>
+        <tr><td colspan="2" style="padding:8px;background:rgba(255,255,255,0.03);font-weight:700;color:var(--accent);">SENDER</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Name</td><td style="padding:4px 8px;color:var(--text);">${c.sender_name}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Email</td><td style="padding:4px 8px;color:var(--text);">${c.sender_email}</td></tr>
+        <tr><td colspan="2" style="padding:8px;background:rgba(255,255,255,0.03);font-weight:700;color:var(--accent);">PACKAGE</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Weight</td><td style="padding:4px 8px;color:var(--text);">${c.weight_kg} kg</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Contents</td><td style="padding:4px 8px;color:var(--text);">${c.package_description}</td></tr>
+        <tr><td colspan="2" style="padding:8px;background:rgba(255,255,255,0.03);font-weight:700;color:var(--accent);">FINANCIALS</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Rate</td><td style="padding:4px 8px;color:var(--text);">$${c.fee_per_kg}/kg</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Total (Escrow)</td><td style="padding:4px 8px;font-weight:700;color:var(--green);">$${c.total_amount} USD</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Platform Fee (10%)</td><td style="padding:4px 8px;color:var(--accent);">$${c.platform_commission} USD</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--muted);">Traveler Payout</td><td style="padding:4px 8px;color:var(--text);">$${c.traveler_payout} USD</td></tr>
+      </table>
+      <hr style="border-color:var(--border);margin:12px 0;"/>
+      <div style="font-weight:700;color:var(--accent);font-size:11px;text-transform:uppercase;margin-bottom:8px;">Agreement Terms</div>
+      <ol style="padding-left:16px;display:flex;flex-direction:column;gap:4px;">
+        ${c.terms.map(t => `<li style="font-size:11px;color:var(--muted);">${t}</li>`).join('')}
+      </ol>
+      <hr style="border-color:var(--border);margin:12px 0;"/>
+      <div style="font-size:10px;color:var(--muted);text-align:center;">
+        This contract was digitally agreed to at the time of booking.<br/>
+        AfriCarryApp  ·  africarryapp.com  ·  © 2026
+      </div>`;
+  } catch(e) {
+    document.getElementById('contract-content').innerHTML =
+      `<p style="color:var(--red);">Could not load contract: ${e.message}</p>`;
+  }
+}
+
+function printContract() {
+  const content = document.getElementById('contract-content').innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>AfriCarryApp Contract</title>
+    <style>body{font-family:Arial,sans-serif;padding:40px;color:#111;font-size:13px;line-height:1.7;}
+    table{width:100%;border-collapse:collapse;}td{padding:5px 8px;}
+    hr{border:none;border-top:1px solid #ccc;margin:14px 0;}</style></head>
+    <body>${content}</body></html>`);
+  w.document.close();
+  w.print();
+}
+
+
 async function setupPayouts(post_id, traveler_name, traveler_email) {
   showToast('Opening Stripe payout setup...');
   try {
@@ -977,13 +1199,115 @@ async function setupPayouts(post_id, traveler_name, traveler_email) {
   }
 }
 
+// ─── EARNINGS CALCULATOR ──────────────────────────────────
+const AIRLINE_DATA = {
+  // ── 2 FREE BAGS ──
+  brussels:    { name:'Brussels Airlines',  bagFee:0,   freeBags:2, extraBags:0, totalBags:2, maxKg:46, note:'<strong>Best option!</strong> Brussels Airlines includes <strong>2 free bags × 23kg = 46kg</strong> on all US–Africa routes. Zero bag cost = maximum earnings.' },
+  delta:       { name:'Delta Air Lines',    bagFee:0,   freeBags:2, extraBags:0, totalBags:2, maxKg:46, note:'<strong>Great option.</strong> Delta includes <strong>2 free bags × 23kg = 46kg</strong> on US–Africa long-haul routes in Economy.' },
+  united_free: { name:'United Airlines',    bagFee:0,   freeBags:2, extraBags:0, totalBags:2, maxKg:46, note:'<strong>Good option.</strong> United includes <strong>2 free bags × 23kg = 46kg</strong> on long-haul Africa routes. Confirm your ticket includes 2 free bags.' },
+  other_free:  { name:'Your Airline',       bagFee:0,   freeBags:2, extraBags:0, totalBags:2, maxKg:46, note:'<strong>Check your ticket.</strong> Many airlines include <strong>2 free bags × 23kg = 46kg</strong> to Africa. Confirm with your airline before posting.' },
+  // ── 1 FREE + PAID 2ND ──
+  united_pay:  { name:'United Airlines',    bagFee:55,  freeBags:1, extraBags:1, totalBags:2, maxKg:46, note:'<strong>Still profitable.</strong> 1 free bag (23kg) + 1 extra ($55) = <strong>46kg total</strong>. Every $55 spent earns back ~$168 net — a 2× return.' },
+  other_pay:   { name:'Your Airline',       bagFee:80,  freeBags:1, extraBags:1, totalBags:2, maxKg:46, note:'<strong>Still worth it.</strong> 1 free bag (23kg) + 1 extra (~$80) = <strong>46kg total</strong>. Even after fees you still pocket significant earnings.' },
+  // ── 3RD BAG ──
+  brussels_3:  { name:'Brussels Airlines',  bagFee:100, freeBags:2, extraBags:1, totalBags:3, maxKg:69, note:'<strong>Power move!</strong> 2 free bags + 1 extra ($100) = <strong>69kg total</strong>. The 3rd bag costs $100 but adds ~23kg of earning capacity — you net ~$147 extra per trip.' },
+  delta_3:     { name:'Delta Air Lines',    bagFee:150, freeBags:2, extraBags:1, totalBags:3, maxKg:69, note:'<strong>Strong option.</strong> 2 free bags + 1 extra ($150) = <strong>69kg total</strong>. The 3rd bag costs $150 — at $12/kg you earn back ~$248 from that extra bag alone.' },
+  united_3:    { name:'United Airlines',    bagFee:150, freeBags:2, extraBags:1, totalBags:3, maxKg:69, note:'<strong>Worth it.</strong> 2 free bags + 1 extra ($150) = <strong>69kg total</strong>. At $12/kg the 3rd bag earns ~$248 gross — well above the $150 fee.' },
+  other_3:     { name:'Your Airline',       bagFee:150, freeBags:2, extraBags:1, totalBags:3, maxKg:69, note:'<strong>Check with your airline.</strong> 2 free bags + 1 extra (~$150) = <strong>69kg total</strong>. 3rd bag fees vary — confirm before booking.' },
+  // ── 4TH BAG (MAX CARGO) ──
+  brussels_4:  { name:'Brussels Airlines',  bagFee:200, freeBags:2, extraBags:2, totalBags:4, maxKg:92, note:'<strong>Maximum earnings!</strong> 2 free + 3rd ($100) + 4th ($100) = <strong>92kg total</strong>. Total bag fees: $200. At $12/kg the extra 46kg earns ~$496 gross — a massive 2.5× return on bag fees.' },
+  delta_4:     { name:'Delta Air Lines',    bagFee:300, freeBags:2, extraBags:2, totalBags:4, maxKg:92, note:'<strong>Max cargo mode.</strong> 2 free + 3rd ($150) + 4th ($150) = <strong>92kg total</strong>. Total bag fees: $300. At $12/kg extra 46kg earns ~$496 gross — still a strong return.' },
+  united_4:    { name:'United Airlines',    bagFee:300, freeBags:2, extraBags:2, totalBags:4, maxKg:92, note:'<strong>Max cargo mode.</strong> 2 free + 3rd ($150) + 4th ($150) = <strong>92kg total</strong>. Total bag fees: $300. Extra 46kg earns ~$496 gross at $12/kg.' },
+  other_4:     { name:'Your Airline',       bagFee:300, freeBags:2, extraBags:2, totalBags:4, maxKg:92, note:'<strong>Check fees carefully.</strong> 2 free + 3rd + 4th = <strong>92kg total</strong>. Bag fees vary widely by airline. Confirm exact costs before booking.' },
+};
+
+function calcEarnings() {
+  const airline  = document.getElementById('calc-airline').value;
+  const rate     = parseFloat(document.getElementById('calc-rate').value);
+  const data     = AIRLINE_DATA[airline];
+
+  // Cap slider to airline's max kg
+  const slider = document.getElementById('calc-kg');
+  if (parseInt(slider.max) !== data.maxKg) {
+    slider.max = data.maxKg;
+    if (parseInt(slider.value) > data.maxKg) slider.value = data.maxKg;
+  }
+  const kg = parseInt(slider.value);
+
+  // Update slider label and range hint
+  document.getElementById('slider-display').innerHTML =
+    `${kg} <span>kg reserved for senders</span>`;
+  slider.nextElementSibling.innerHTML =
+    `<span>5 kg min</span><span>${data.maxKg} kg max (${data.totalBags} bag${data.totalBags>1?'s':''})</span>`;
+
+  const gross      = kg * rate;
+  const commission = gross * 0.10;
+  const stripeFee  = gross * 0.029 + 0.30;
+  const bagFee     = data.bagFee;
+  const net        = gross - commission - stripeFee - bagFee;
+  const perKgNet   = net / kg;
+
+  // Build bag fee breakdown string
+  let bagFeeRow = '';
+  if (bagFee === 0) {
+    bagFeeRow = `<div class="earnings-breakdown-row"><span>Checked bag fees</span><span style="color:var(--green)">FREE ✓ (${data.freeBags} bags included)</span></div>`;
+  } else if (data.extraBags === 1) {
+    bagFeeRow = `<div class="earnings-breakdown-row deduct"><span>Extra bag fee (bag ${data.freeBags + 1})</span><span>-$${bagFee.toFixed(2)}</span></div>`;
+  } else {
+    bagFeeRow = `<div class="earnings-breakdown-row deduct"><span>Extra bag fees (bags ${data.freeBags+1} &amp; ${data.totalBags})</span><span>-$${bagFee.toFixed(2)}</span></div>`;
+  }
+
+  document.getElementById('earnings-grid').innerHTML = `
+    <div class="earnings-result-item">
+      <div class="val">$${gross.toFixed(0)}</div>
+      <div class="lbl">Gross Earnings</div>
+    </div>
+    <div class="earnings-result-item deduct">
+      <div class="val">-$${(commission + stripeFee + bagFee).toFixed(0)}</div>
+      <div class="lbl">Total Deductions</div>
+    </div>
+    <div class="earnings-result-item highlight">
+      <div class="val">$${Math.max(0, net).toFixed(0)}</div>
+      <div class="lbl">Your Net Earnings</div>
+    </div>`;
+
+  document.getElementById('earnings-breakdown').innerHTML = `
+    <div class="earnings-breakdown-row"><span>Bag allowance</span><span style="color:var(--green)">${data.freeBags} free${data.extraBags > 0 ? ` + ${data.extraBags} paid` : ''} = ${data.totalBags} bag${data.totalBags>1?'s':''} × 23kg = ${data.maxKg}kg total</span></div>
+    <div class="earnings-breakdown-row"><span>${kg} kg × $${rate}/kg</span><span>$${gross.toFixed(2)}</span></div>
+    <div class="earnings-breakdown-row comm"><span>AfriCarryApp commission (10%)</span><span>-$${commission.toFixed(2)}</span></div>
+    <div class="earnings-breakdown-row deduct"><span>Stripe processing fee (2.9% + $0.30)</span><span>-$${stripeFee.toFixed(2)}</span></div>
+    ${bagFeeRow}
+    <div class="earnings-breakdown-row net"><span>💰 Your net earnings</span><span>$${Math.max(0, net).toFixed(2)}</span></div>
+    <div class="earnings-breakdown-row"><span>That is $${Math.max(0, perKgNet).toFixed(2)} per kg carried</span><span></span></div>`;
+
+  document.getElementById('airline-note').innerHTML = data.note;
+}
+
+function toggleCalc() {
+  const body   = document.getElementById('earnings-body');
+  const btn    = document.getElementById('calc-toggle');
+  const hidden = body.classList.toggle('collapsed');
+  btn.textContent = hidden ? '▼ Show Calculator' : '▲ Hide Calculator';
+}
+
+function scrollToForm() {
+  document.getElementById('post-form-section').scrollIntoView({ behavior:'smooth' });
+}
+
 window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOString().split('T')[0];
   document.getElementById('f-date').min=today;
   document.getElementById('f-return').min=today;
   if(localStorage.getItem(SB_URL_K)){document.getElementById('sb-url').value=localStorage.getItem(SB_URL_K);document.getElementById('sb-key').value=localStorage.getItem(SB_KEY_K);}
   initSB();
-  initStripe();loadAll();
+  initStripe();
+  calcEarnings();
+  loadAll();
 });
 </script>
 </body>
 </html>
+
+ 
+ 
+ 
+       
