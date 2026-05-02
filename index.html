@@ -468,14 +468,55 @@
 <div class="modal-overlay" id="confirm-modal">
   <div class="modal">
     <h2>✅ Confirm Delivery</h2>
-    <p>Has your package been delivered? Confirming releases payment to the traveler.</p>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px;line-height:1.6;">
+      <strong style="color:var(--text)">Both the sender and traveler must confirm</strong> before funds are released.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+      <button id="conf-tab-sender"  class="type-btn type-btn-active" onclick="setConfTab('sender')" style="padding:10px;">
+        📦 <strong>I am the Sender</strong><br/><span style="font-size:11px;font-weight:400;">I received my package</span>
+      </button>
+      <button id="conf-tab-traveler" class="type-btn" onclick="setConfTab('traveler')" style="padding:10px;">
+        ✈ <strong>I am the Traveler</strong><br/><span style="font-size:11px;font-weight:400;">I delivered the package</span>
+      </button>
+    </div>
     <div class="payment-field"><label>Your Email</label><input type="email" id="cf-email" placeholder="your@email.com"/></div>
     <div class="payment-field"><label>Booking ID</label><input type="text" id="cf-booking-id" placeholder="e.g. 42"/></div>
+    <div id="cf-sender-section">
+      <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--green);margin-bottom:12px;line-height:1.5;">
+        ✅ Your confirmation is recorded. <strong>Funds only release once the traveler also confirms.</strong>
+      </div>
+    </div>
+    <div id="cf-traveler-section" style="display:none;">
+      <div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#60a5fa;margin-bottom:12px;line-height:1.5;">
+        ✈ Your confirmation is recorded. <strong>Funds only release once the sender also confirms.</strong> Your trip listing will be removed automatically.
+      </div>
+    </div>
+    <div style="background:rgba(232,160,32,0.07);border:1px solid rgba(232,160,32,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+      ⚠ <strong style="color:var(--accent)">Funds held in escrow until BOTH parties confirm.</strong> Once both confirm, payment releases automatically. You have 48 hours to raise a dispute instead.
+    </div>
     <div class="confirm-row">
-      <button class="btn-confirm" onclick="confirmDelivery()">✅ Yes, Delivered</button>
+      <button class="btn-confirm" id="cf-confirm-btn" onclick="confirmDelivery()">✅ Confirm My Part</button>
       <button class="btn-dispute" onclick="openDispute()">⚠ Raise Dispute</button>
     </div>
     <div class="modal-actions" style="margin-top:12px;"><button class="btn-cancel" onclick="closeConfirm()">Close</button></div>
+  </div>
+</div>
+
+<!-- MARK TRIP COMPLETE MODAL -->
+<div class="modal-overlay" id="complete-modal">
+  <div class="modal">
+    <h2>✓ Mark Trip Complete</h2>
+    <p style="color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:16px;">
+      Only mark complete once <strong style="color:var(--text)">all packages have been delivered</strong>. Your listing is removed immediately. Payout releases only after the sender also confirms.
+    </p>
+    <div class="payment-field"><label>Your Email (used when you posted the trip)</label><input type="email" id="complete-email" placeholder="your@email.com"/></div>
+    <div style="background:rgba(232,160,32,0.07);border:1px solid rgba(232,160,32,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+      ⚠ <strong style="color:var(--accent)">Remember:</strong> Payout is only released once the sender independently confirms delivery too. Both confirmations are required.
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeMarkComplete()">Cancel</button>
+      <button class="btn-save" onclick="submitMarkComplete()" style="background:var(--green);color:#fff;">✓ Yes, Mark Complete</button>
+    </div>
   </div>
 </div>
 
@@ -697,11 +738,21 @@
   <section id="listings-section">
     <h2 class="section-title">Available Travelers</h2>
     <p class="section-sub">Browse travelers heading to Liberia. Read reviews from past senders before reaching out.</p>
-    <div class="filters">
-      <button class="filter-btn active" onclick="setFilter('all',this)">All Trips</button>
-      <button class="filter-btn" onclick="setFilter('upcoming',this)">Upcoming Only</button>
+    <div class="filters" id="filter-bar">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('upcoming',this)">Upcoming</button>
       <button class="filter-btn" onclick="setFilter('low-fee',this)">Lowest Fee</button>
       <button class="filter-btn" onclick="setFilter('top-rated',this)">⭐ Top Rated</button>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+      <div style="position:relative;flex:1;min-width:200px;">
+        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;">📍</span>
+        <input type="text" id="location-search" placeholder="Search by departure city (e.g. Atlanta, New York...)"
+          oninput="renderFiltered()"
+          style="width:100%;padding:10px 14px 10px 36px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+      </div>
+      <div id="location-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
     </div>
     <div class="listings" id="listings-container">
       <div style="text-align:center;padding:40px"><div class="spinner"></div></div>
@@ -795,14 +846,14 @@ function saveConfig(){
 
 /* ── LOAD ALL ── */
 async function loadAll(){
-  if(!sb){posts=DEMO_P;reviews=DEMO_R;render();updateStats();return;}
+  if(!sb){posts=DEMO_P;reviews=DEMO_R;renderFiltered();updateStats();return;}
   const [pr,rr]=await Promise.all([
     sb.from('travel_posts').select('*').order('travel_date',{ascending:true}),
     sb.from('reviews').select('*').order('created_at',{ascending:false})
   ]);
   posts=pr.data||[];reviews={};
   (rr.data||[]).forEach(r=>{if(!reviews[r.post_id])reviews[r.post_id]=[];reviews[r.post_id].push(r);});
-  render();updateStats();
+  renderFiltered();updateStats();
 }
 
 /* ── POST TRIP ── */
@@ -821,7 +872,7 @@ async function submitPost(){
   const rec={name:n,contact:c,origin:o,destination:d||'Monrovia (ROB)',travel_date:dt,return_date:rt||null,fee_per_kg:fee,max_kg:kg,letter_fee:letterfee,phone_fee:phonefee,luggage_fee:luggagefee,notes:nt||null};
   if(!sb){
     posts=[{...rec,id:Date.now(),created_at:new Date().toISOString()},...posts];
-    render();updateStats();clearPF();btn.disabled=false;btn.innerHTML='✈ Post Trip';showToast('✓ Trip posted! (Demo mode)');return;
+    renderFiltered();updateStats();clearPF();btn.disabled=false;btn.innerHTML='✈ Post Trip';showToast('✓ Trip posted! (Demo mode)');return;
   }
   const{error}=await sb.from('travel_posts').insert([rec]);
   btn.disabled=false;btn.innerHTML='✈ Post Trip';
@@ -845,7 +896,7 @@ async function submitReview(pid){
   if(!sb){
     const nr={...rec,id:Date.now(),created_at:new Date().toISOString()};
     if(!reviews[pid])reviews[pid]=[];reviews[pid].unshift(nr);
-    render();updateStats();
+    renderFiltered();updateStats();
     setTimeout(()=>{const t=document.getElementById('toggle-'+pid);if(t&&!t.classList.contains('expanded'))toggleRev(pid);},80);
     showToast('✓ Review posted! (Demo mode)');return;
   }
@@ -869,19 +920,88 @@ function toggleRev(pid){
   const b=document.getElementById('reviews-body-'+pid),t=document.getElementById('toggle-'+pid);
   const o=b.classList.contains('open');b.classList.toggle('open',!o);t.classList.toggle('expanded',!o);
 }
-function setFilter(f,el){curFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');render();}
+function setFilter(f,el){
+  curFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderFiltered();
+}
+
+function renderFiltered() {
+  const locQuery = (document.getElementById('location-search')?.value||'').trim().toLowerCase();
+  let data = [...posts];
+  const today = new Date().toISOString().split('T')[0];
+
+  // ── AUTO-HIDE: past trips and completed trips ──
+  data = data.filter(d => {
+    if (d.status === 'completed') return false;  // traveler marked complete
+    if (d.travel_date < today)   return false;   // travel date has passed
+    return true;
+  });
+
+  // Apply sort/filter
+  if(curFilter==='upcoming')  data = data.filter(d=>d.travel_date>=today);
+  if(curFilter==='low-fee')   data = [...data].sort((a,b)=>a.fee_per_kg-b.fee_per_kg);
+  if(curFilter==='top-rated') data = [...data].sort((a,b)=>(avgRating(b.id)??-1)-(avgRating(a.id)??-1));
+
+  // Apply location search
+  if(locQuery) data = data.filter(d=>(d.origin||'').toLowerCase().includes(locQuery));
+
+  // Build dynamic city chips from all posts (not filtered)
+  buildCityChips(posts, locQuery);
+
+  render(data, today);
+}
+
+function buildCityChips(allPosts, activeQuery) {
+  // Extract unique cities from origin field
+  const cities = {};
+  allPosts.forEach(p => {
+    if (!p.origin) return;
+    // Extract city name before the parenthesis e.g. "New York (JFK)" → "New York"
+    const city = p.origin.replace(/\s*\([^)]*\)/, '').trim();
+    cities[city] = (cities[city] || 0) + 1;
+  });
+
+  const chip_container = document.getElementById('location-chips');
+  if (!chip_container) return;
+
+  const sorted = Object.entries(cities).sort((a,b)=>b[1]-a[1]);
+  chip_container.innerHTML = sorted.map(([city, count]) => {
+    const isActive = activeQuery && city.toLowerCase().includes(activeQuery);
+    return `<button onclick="selectCity('${city}')" style="
+      padding:5px 12px;border-radius:16px;border:1px solid ${isActive?'var(--accent)':'var(--border)'};
+      background:${isActive?'rgba(232,160,32,0.15)':'transparent'};
+      color:${isActive?'var(--accent)':'var(--muted)'};
+      font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;
+      font-weight:${isActive?'700':'400'};transition:all .2s;white-space:nowrap;">
+      📍 ${city} <span style="opacity:.6">(${count})</span>
+    </button>`;
+  }).join('');
+}
+
+function selectCity(city) {
+  const input = document.getElementById('location-search');
+  if (!input) return;
+  // Toggle — if already selected, clear it
+  if (input.value.toLowerCase() === city.toLowerCase()) {
+    input.value = '';
+  } else {
+    input.value = city;
+  }
+  renderFiltered();
+}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showToast(m,e){const t=document.getElementById('toast');t.textContent=m;t.className='toast'+(e?' error':'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
 function scrollToPost(){document.getElementById('post-section').scrollIntoView({behavior:'smooth'});}
 function scrollToListings(){document.getElementById('listings-section').scrollIntoView({behavior:'smooth'});}
 
 /* ── RENDER ── */
-function render(){
-  let data=[...posts];
-  const today=new Date().toISOString().split('T')[0];
-  if(curFilter==='upcoming')data=data.filter(d=>d.travel_date>=today);
-  if(curFilter==='low-fee')data=[...data].sort((a,b)=>a.fee_per_kg-b.fee_per_kg);
-  if(curFilter==='top-rated')data=[...data].sort((a,b)=>(avgRating(b.id)??-1)-(avgRating(a.id)??-1));
+function render(data, today) {
+  if (!data) {
+    // Called without args — use renderFiltered instead
+    renderFiltered(); return;
+  }
   const con=document.getElementById('listings-container');
   if(!data.length){con.innerHTML=`<div class="empty-state"><div class="empty-icon">✈</div><h3>No trips found</h3><p>Be the first to post your travel dates above!</p></div>`;return;}
   con.innerHTML=data.map(p=>buildCard(p,today)).join('');
@@ -939,6 +1059,7 @@ function buildCard(p,today){
         <div>
           <a href="https://www.dhl.com/us-en/home/get-a-quote.html" target="_blank" class="dhl-compare">vs <span class="dhl-logo">DHL</span> rates ↗</a>
           <button class="book-btn" onclick="openBooking(${p.id}, '${esc(p.name)}', ${p.fee_per_kg}, ${p.max_kg}, ${p.letter_fee||'null'}, ${p.phone_fee||'null'}, ${p.luggage_fee||'null'})">🔒 Book &amp; Pay Securely</button>
+          <button onclick="openMarkComplete(${p.id})" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:8px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;margin-top:6px;transition:all .2s;" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✓ Mark Trip Complete</button>
         </div>
       </div>
     </div>
@@ -1231,6 +1352,21 @@ async function processPayment() {
 }
 
 // ── CONFIRM DELIVERY ──────────────────────────────────────
+let confRole = 'sender'; // 'sender' or 'traveler'
+let activeCompletePostId = null;
+
+function setConfTab(role) {
+  confRole = role;
+  document.getElementById('conf-tab-sender').classList.toggle('type-btn-active',  role === 'sender');
+  document.getElementById('conf-tab-traveler').classList.toggle('type-btn-active', role === 'traveler');
+  document.getElementById('cf-sender-section').style.display   = role === 'sender'   ? 'block' : 'none';
+  document.getElementById('cf-traveler-section').style.display = role === 'traveler' ? 'block' : 'none';
+  document.getElementById('cf-confirm-btn').textContent = role === 'sender'
+    ? '✅ Confirm — Package Received'
+    : '✈ Confirm — Package Delivered';
+}
+
+
 function openConfirmDelivery() {
   document.getElementById('confirm-modal').classList.add('open');
   if (activeBookingId) document.getElementById('cf-booking-id').value = activeBookingId;
@@ -1246,18 +1382,70 @@ async function confirmDelivery() {
     const res = await fetch(`${API_BASE}?action=confirm_delivery`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ booking_id: parseInt(booking_id), sender_email: email })
+      body: JSON.stringify({ booking_id: parseInt(booking_id), sender_email: email, role: confRole })
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-    showToast('✓ Delivery confirmed! Traveler payout released.');
+
+    if (data.status === 'pending_other_confirmation') {
+      // One party confirmed — waiting for the other
+      showToast(`✓ Your confirmation recorded! Waiting for the ${confRole === 'sender' ? 'traveler' : 'sender'} to also confirm before funds release.`);
+    } else {
+      // Both confirmed — payout released
+      showToast('✅ Both parties confirmed! Traveler payout released. Trip complete.');
+      // Remove the completed trip from local posts array
+      if (data.post_id) {
+        posts = posts.map(p => p.id === data.post_id ? {...p, status:'completed'} : p);
+        renderFiltered();
+      }
+    }
     closeConfirm();
   } catch (e) {
     showToast(e.message, true);
   }
 }
 
-// ── DISPUTE ───────────────────────────────────────────────
+// ── MARK TRIP COMPLETE (traveler) ─────────────────────────
+function openMarkComplete(postId) {
+  activeCompletePostId = postId;
+  document.getElementById('complete-email').value = '';
+  document.getElementById('complete-modal').classList.add('open');
+}
+function closeMarkComplete() {
+  document.getElementById('complete-modal').classList.remove('open');
+  activeCompletePostId = null;
+}
+
+async function submitMarkComplete() {
+  const email = document.getElementById('complete-email').value.trim();
+  if (!email) { showToast('Please enter your email.', true); return; }
+
+  if (!sb) {
+    // Demo mode — remove from local array
+    posts = posts.map(p => p.id === activeCompletePostId ? {...p, status:'completed'} : p);
+    renderFiltered();
+    closeMarkComplete();
+    showToast('✓ Trip marked complete. Listing removed. (Demo mode)');
+    return;
+  }
+
+  try {
+    const { error } = await sb.from('travel_posts')
+      .update({ status: 'completed' })
+      .eq('id', activeCompletePostId)
+      .eq('contact', email);  // verify by contact email
+
+    if (error) throw new Error(error.message);
+    posts = posts.map(p => p.id === activeCompletePostId ? {...p, status:'completed'} : p);
+    renderFiltered();
+    closeMarkComplete();
+    showToast('✓ Trip marked complete. Listing removed. Awaiting sender confirmation for payout.');
+  } catch(e) {
+    showToast('Could not mark complete: ' + e.message, true);
+  }
+}
+
+
 function openDispute() {
   document.getElementById('confirm-modal').classList.remove('open');
   document.getElementById('dispute-modal').classList.add('open');
