@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
 <title>AfriCarryApp — Fly & Carry</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,7 +21,7 @@
 
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); backdrop-filter:blur(5px); z-index:1000; align-items:center; justify-content:center; padding:16px; }
   .modal-overlay.open { display:flex; }
-  .modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
   .modal h2 { font-family:'Playfair Display',serif; font-size:22px; margin-bottom:8px; }
   .modal > p { color:var(--muted); font-size:13px; margin-bottom:20px; line-height:1.6; }
   .modal label { display:block; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px; }
@@ -297,15 +297,25 @@
     .modal-overlay {
       align-items: flex-end;
       padding: 0;
+      /* Fix iOS - overlay must be scrollable container */
+      overflow: hidden;
     }
     .modal {
       border-radius: 20px 20px 0 0;
       max-width: 100% !important;
       width: 100%;
-      max-height: 92vh;
-      padding: 20px 16px 32px;
-      overflow-y: auto;
+      /* Use dvh for iOS Safari dynamic viewport */
+      height: 90dvh;
+      height: 90vh; /* fallback */
+      max-height: 90dvh;
+      max-height: 90vh;
+      padding: 20px 16px 40px;
+      /* Critical scroll fixes for iOS */
+      overflow-y: scroll !important;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      /* Prevent content from being hidden under home bar */
+      padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
     }
     .modal h2 { font-size: 18px; margin-bottom: 6px; }
     .modal > p { font-size: 12px; margin-bottom: 14px; }
@@ -503,26 +513,30 @@
       </div>
     </div>
 
-    <div class="escrow-note">🔒 Your payment is held in escrow. The traveler only receives payment after you confirm delivery. You have 48 hours to raise a dispute.</div>
-    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--muted);margin:8px 0;line-height:1.6;">
-      📦 <strong style="color:var(--red)">Storage Fee Policy:</strong> If items are not collected on the day the traveler arrives in Liberia, a daily storage fee will be charged: <strong style="color:var(--red)">$10/day for full luggage</strong> and <strong style="color:var(--red)">$5/day for letters and packages</strong>. Recipients should be notified in advance of the arrival date.
+    <div class="escrow-note">🔒 Payment held in escrow — released only after both parties confirm delivery.</div>
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);margin:8px 0;line-height:1.5;">
+      📦 <strong style="color:var(--red)">Storage fees:</strong> $10/day for luggage · $5/day for letters &amp; packages if uncollected on arrival day.
     </div>
-    <div class="contract-box">
-      <h4>📄 Shipping Agreement — Summary</h4>
-      <ol>
-        <li>Sender confirms all items comply with US, Liberian, and international customs laws.</li>
-        <li>Traveler agrees to carry the package safely and deliver it to the recipient.</li>
-        <li>Payment is held in escrow by AfriCarryApp until delivery is confirmed by the sender.</li>
-        <li>Sender has 48 hours after expected delivery to raise a dispute.</li>
-        <li>Neither party may transport prohibited items as listed in AfriCarryApp Terms of Use.</li>
-        <li>AfriCarryApp retains a 10% platform commission from the total shipment fee.</li>
-        <li>This agreement is legally binding upon payment confirmation.</li>
-        <li><strong>Storage fees apply</strong> for each day items remain uncollected after the traveler's arrival date in Liberia: <strong>$10/day for full luggage</strong> and <strong>$5/day for letters and packages</strong>. Fees are payable by the sender and deducted before payout release.</li>
-      </ol>
-    </div>
+    <details style="margin:8px 0;">
+      <summary style="font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;padding:10px 14px;background:rgba(232,160,32,0.04);border:1px solid rgba(232,160,32,0.2);border-radius:10px;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+        📄 Shipping Agreement <span style="font-size:10px;font-weight:400;color:var(--muted);">tap to read ▾</span>
+      </summary>
+      <div class="contract-box" style="border-radius:0 0 10px 10px;margin-top:-1px;border-top:none;">
+        <ol>
+          <li>Sender confirms all items comply with US, Liberian, and international customs laws.</li>
+          <li>Traveler agrees to carry the package safely and deliver it to the recipient.</li>
+          <li>Payment is held in escrow until delivery is confirmed by the sender.</li>
+          <li>Sender has 48 hours after expected delivery to raise a dispute.</li>
+          <li>Neither party may transport prohibited items per AfriCarryApp Terms of Use.</li>
+          <li>AfriCarryApp retains a 10% platform commission.</li>
+          <li>Storage fees apply for uncollected items: $10/day for luggage, $5/day for packages.</li>
+          <li>This agreement is legally binding upon payment confirmation.</li>
+        </ol>
+      </div>
+    </details>
     <div class="contract-agree">
       <input type="checkbox" id="bk-contract-agree"/>
-      <label for="bk-contract-agree">I have read and agree to the <strong>Shipping Agreement</strong> above. I confirm my package contents are legal and comply with all customs laws. I understand this is a binding contract.</label>
+      <label for="bk-contract-agree">I agree to the <strong>Shipping Agreement</strong>. My package contents are legal and comply with all customs laws.</label>
     </div>
     <div class="payment-field"><label>Card Details</label>
       <div id="stripe-card-element"></div>
@@ -1769,3 +1783,5 @@ window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOSt
 </script>
 </body>
 </html>
+
+
