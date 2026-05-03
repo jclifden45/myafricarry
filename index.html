@@ -146,6 +146,25 @@
   .btn-pay:hover { background:#0d9e6e; }
   .btn-pay:disabled { opacity:.5; cursor:not-allowed; }
 
+  /* ── RECIPIENTS ── */
+  .recipient-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:10px; position:relative; }
+  .recipient-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .recipient-num { font-size:12px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.05em; }
+  .recipient-remove { background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:16px; padding:2px 6px; border-radius:4px; transition:color .2s; }
+  .recipient-remove:hover { color:var(--red); }
+  .recipient-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .recipient-field { display:flex; flex-direction:column; gap:4px; }
+  .recipient-field label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .recipient-field input, .recipient-field select { background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px 10px; font-size:13px; font-family:'DM Sans',sans-serif; }
+  .recipient-field input:focus, .recipient-field select:focus { outline:none; border-color:var(--accent); }
+  .recipient-items { margin-top:10px; padding-top:10px; border-top:1px solid var(--border); display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .recipient-item-row { display:flex; align-items:center; gap:6px; }
+  .recipient-item-row input[type=checkbox] { accent-color:var(--accent); cursor:pointer; }
+  .recipient-item-row label { font-size:12px; color:var(--text); cursor:pointer; flex:1; }
+  .recipient-item-row select { background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:4px 6px; font-size:12px; font-family:'DM Sans',sans-serif; }
+  .add-recipient-btn { width:100%; padding:10px; background:transparent; border:1px dashed var(--accent); border-radius:10px; color:var(--accent); font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; margin-bottom:12px; }
+  .add-recipient-btn:hover { background:rgba(232,160,32,0.08); }
+
   /* ── CONFIRM DELIVERY MODAL ── */
   .confirm-row { display:flex; gap:10px; margin-top:16px; }
   .btn-confirm { background:var(--green); color:#fff; border:none; padding:11px 20px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; font-family:'DM Sans',sans-serif; flex:1; }
@@ -428,10 +447,16 @@
       </div>
     </div>
 
-    <div class="payment-field"><label>Your Name</label><input type="text" id="bk-name" placeholder="Full name"/></div>
+    <div class="payment-field"><label>Your Name (Sender)</label><input type="text" id="bk-name" placeholder="Your full name"/></div>
     <div class="payment-field"><label>Your Email</label><input type="email" id="bk-email" placeholder="your@email.com"/></div>
-    <div class="payment-field"><label>WhatsApp / Phone (optional)</label><input type="text" id="bk-phone" placeholder="+1 xxx xxx xxxx"/></div>
-    <div class="payment-field"><label>Package Description</label><input type="text" id="bk-desc" placeholder="e.g. Clothing, letters, vitamins, phones"/></div>
+    <div class="payment-field"><label>Your WhatsApp / Phone (optional)</label><input type="text" id="bk-phone" placeholder="+1 xxx xxx xxxx"/></div>
+
+    <!-- RECIPIENTS -->
+    <div class="payment-field">
+      <label>Recipients in Liberia <span style="color:var(--muted);font-weight:400;font-size:11px;">— add one per person</span></label>
+      <div id="recipients-container" style="margin-top:8px;"></div>
+      <button class="add-recipient-btn" onclick="addRecipient()">＋ Add Another Recipient</button>
+    </div>
 
     <div id="luggage-field" style="display:none;">
       <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;">
@@ -454,6 +479,9 @@
     </div>
 
     <div class="escrow-note">🔒 Your payment is held in escrow. The traveler only receives payment after you confirm delivery. You have 48 hours to raise a dispute.</div>
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--muted);margin:8px 0;line-height:1.6;">
+      📦 <strong style="color:var(--red)">Storage Fee Policy:</strong> If items are not collected on the day the traveler arrives in Liberia, a daily storage fee will be charged: <strong style="color:var(--red)">$10/day for full luggage</strong> and <strong style="color:var(--red)">$5/day for letters and packages</strong>. Recipients should be notified in advance of the arrival date.
+    </div>
     <div class="contract-box">
       <h4>📄 Shipping Agreement — Summary</h4>
       <ol>
@@ -464,6 +492,7 @@
         <li>Neither party may transport prohibited items as listed in AfriCarryApp Terms of Use.</li>
         <li>AfriCarryApp retains a 10% platform commission from the total shipment fee.</li>
         <li>This agreement is legally binding upon payment confirmation.</li>
+        <li><strong>Storage fees apply</strong> for each day items remain uncollected after the traveler's arrival date in Liberia: <strong>$10/day for full luggage</strong> and <strong>$5/day for letters and packages</strong>. Fees are payable by the sender and deducted before payout release.</li>
       </ol>
     </div>
     <div class="contract-agree">
@@ -672,7 +701,13 @@
     <hr class="legal-divider"/>
 
     <div class="legal-section">
-      <h3>6. Governing Law</h3>
+      <h3>6. Storage Fee Policy</h3>
+      <p>If a recipient fails to collect their package on the day the traveler arrives in Liberia, the following daily storage fees apply: <strong>$10 USD per day for full luggage</strong> and <strong>$5 USD per day for letters and packages</strong>. Senders are responsible for ensuring recipients are notified of the traveler's arrival date. Storage fees are deducted from the escrow balance before payout is released to the traveler. AfriCarryApp reserves the right to arrange return or disposal of uncollected items after 7 days.</p>
+    </div>
+    <hr class="legal-divider"/>
+
+    <div class="legal-section">
+      <h3>7. Governing Law</h3>
       <p>These terms are governed by the laws of the United States of America. Last updated: April 2026.</p>
     </div>
 
@@ -1136,56 +1171,120 @@ let stripeCard     = null;
 let currentBooking = { post_id: null, traveler_name: '', fee_per_kg: 0, max_kg: 0, letter_fee: null, phone_fee: null, luggage_fee: null };
 let activeBookingId = null;
 
-// ── MULTI-ITEM BOOKING CART ───────────────────────────────
-let bookingType = 'multi'; // kept for compatibility
-function setBookingType(type) { updateBookingSummary(); }
+// ── RECIPIENTS SYSTEM ─────────────────────────────────────
+let recipientCount = 0;
 
-function updateBookingSummary() {
-  const c = currentBooking;
-  const hasKg      = document.getElementById('item-kg')?.checked;
-  const hasLetter  = document.getElementById('item-letter')?.checked;
-  const hasPhone   = document.getElementById('item-phone')?.checked;
-  const hasLuggage = document.getElementById('item-luggage')?.checked;
+function addRecipient() {
+  recipientCount++;
+  const id = recipientCount;
+  const c  = currentBooking;
 
-  const kgDetail = document.getElementById('item-kg-detail');
-  const ltDetail = document.getElementById('item-letter-detail');
-  const phDetail = document.getElementById('item-phone-detail');
-  const lgDetail = document.getElementById('item-luggage-detail');
-  if (kgDetail) kgDetail.style.display = hasKg      ? 'block' : 'none';
-  if (ltDetail) ltDetail.style.display = hasLetter  ? 'block' : 'none';
-  if (phDetail) phDetail.style.display = hasPhone   ? 'block' : 'none';
-  if (lgDetail) lgDetail.style.display = hasLuggage ? 'block' : 'none';
+  const letterOption = c.letter_fee
+    ? `<div class="recipient-item-row">
+        <input type="checkbox" id="r${id}-letter" onchange="updateBookingSummary()"/>
+        <label for="r${id}-letter">✉ Letters</label>
+        <select id="r${id}-letter-qty" onchange="updateBookingSummary()">
+          ${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join('')}
+        </select>
+      </div>` : '';
 
-  const w         = hasKg      ? (parseFloat(document.getElementById('bk-weight')?.value)      || 0) : 0;
-  const letterQty = hasLetter  ? parseInt(document.getElementById('bk-letter-qty')?.value      || '1') : 0;
-  const phoneQty  = hasPhone   ? parseInt(document.getElementById('bk-phone-qty')?.value       || '1') : 0;
+  const phoneOption = c.phone_fee
+    ? `<div class="recipient-item-row">
+        <input type="checkbox" id="r${id}-phone" onchange="updateBookingSummary()"/>
+        <label for="r${id}-phone">📱 Phones</label>
+        <select id="r${id}-phone-qty" onchange="updateBookingSummary()">
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </select>
+      </div>` : '';
 
-  const kgTotal      = w         * (c.fee_per_kg  || 0);
-  const letterTotal  = letterQty * (c.letter_fee  || 0);
-  const phoneTotal   = phoneQty  * (c.phone_fee   || 0);
-  const luggageTotal = hasLuggage ? ((c.luggage_fee || 0) + 200) : 0;
-  const subtotal     = kgTotal + letterTotal + phoneTotal + luggageTotal;
-  const commission   = subtotal * 0.10;
+  const kgOption = `<div class="recipient-item-row">
+      <input type="checkbox" id="r${id}-kg" onchange="updateBookingSummary()"/>
+      <label for="r${id}-kg">⚖️ Weight (kg)</label>
+      <input type="number" id="r${id}-kg-val" min="0.5" max="30" step="0.5" value="1"
+        oninput="updateBookingSummary()"
+        style="width:55px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:4px 6px;font-size:12px;font-family:'DM Sans',sans-serif;"/>
+    </div>`;
 
-  let rows = `<div class="booking-summary-row"><span>Traveler</span><span>${c.traveler_name}</span></div>`;
-  if (hasKg && w > 0)
-    rows += `<div class="booking-summary-row"><span>⚖️ ${w}kg × $${c.fee_per_kg}/kg</span><span>$${kgTotal.toFixed(2)}</span></div>`;
-  if (hasLetter && letterQty > 0)
-    rows += `<div class="booking-summary-row"><span>✉ ${letterQty} letter${letterQty>1?'s':''} × $${c.letter_fee}</span><span>$${letterTotal.toFixed(2)}</span></div>`;
-  if (hasPhone && phoneQty > 0)
-    rows += `<div class="booking-summary-row"><span>📱 ${phoneQty} phone${phoneQty>1?'s':''} × $${c.phone_fee}</span><span>$${phoneTotal.toFixed(2)}</span></div>`;
-  if (hasLuggage)
-    rows += `<div class="booking-summary-row"><span>🧳 Full luggage ($200 bag + $${c.luggage_fee} fee)</span><span>$${luggageTotal.toFixed(2)}</span></div>`;
+  const luggageOption = c.luggage_fee
+    ? `<div class="recipient-item-row" style="grid-column:span 2;">
+        <input type="checkbox" id="r${id}-luggage" onchange="updateBookingSummary()"/>
+        <label for="r${id}-luggage">🧳 Full Luggage ($${c.luggage_fee + 200})</label>
+      </div>` : '';
 
-  if (subtotal > 0) {
-    rows += `<div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${commission.toFixed(2)}</span></div>`;
-    rows += `<div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${subtotal.toFixed(2)}</b></span></div>`;
-  } else {
-    rows += `<div class="booking-summary-row total"><span>Select items above to see total</span><span></span></div>`;
-  }
-  document.getElementById('booking-summary').innerHTML = rows;
+  const card = document.createElement('div');
+  card.className = 'recipient-card';
+  card.id = `recipient-${id}`;
+  card.innerHTML = `
+    <div class="recipient-card-header">
+      <span class="recipient-num">Recipient ${id}</span>
+      <button class="recipient-remove" onclick="removeRecipient(${id})" title="Remove">✕</button>
+    </div>
+    <div class="recipient-grid">
+      <div class="recipient-field" style="grid-column:span 2;">
+        <label>Recipient Name</label>
+        <input type="text" id="r${id}-name" placeholder="Full name in Liberia"/>
+      </div>
+      <div class="recipient-field">
+        <label>Phone / WhatsApp</label>
+        <input type="text" id="r${id}-phone" placeholder="+231 xxx xxxx"/>
+      </div>
+      <div class="recipient-field">
+        <label>Area in Monrovia</label>
+        <input type="text" id="r${id}-area" placeholder="e.g. Sinkor, Congo Town"/>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">
+      ⚠ Notify this recipient of the traveler's arrival date. Storage fees: <strong style="color:var(--red)">$10/day for luggage · $5/day for letters &amp; packages</strong> if not collected on arrival day.
+    </p>
+    <div class="recipient-items">
+      ${kgOption}
+      ${letterOption}
+      ${phoneOption}
+      ${luggageOption}
+    </div>`;
+
+  document.getElementById('recipients-container').appendChild(card);
+  updateBookingSummary();
 }
 
+function removeRecipient(id) {
+  const card = document.getElementById(`recipient-${id}`);
+  if (card) card.remove();
+  updateBookingSummary();
+}
+
+function getRecipients() {
+  const c = currentBooking;
+  const recipients = [];
+  for (let id = 1; id <= recipientCount; id++) {
+    if (!document.getElementById(`recipient-${id}`)) continue;
+    const name  = document.getElementById(`r${id}-name`)?.value.trim()  || '';
+    const phone = document.getElementById(`r${id}-phone`)?.value.trim() || '';
+    const area  = document.getElementById(`r${id}-area`)?.value.trim()  || '';
+    const hasKg      = document.getElementById(`r${id}-kg`)?.checked;
+    const hasLetter  = document.getElementById(`r${id}-letter`)?.checked;
+    const hasPhone   = document.getElementById(`r${id}-phone-checkbox`)?.checked || document.getElementById(`r${id}-phone`)?.checked;
+    const hasLuggage = document.getElementById(`r${id}-luggage`)?.checked;
+    const kgVal      = parseFloat(document.getElementById(`r${id}-kg-val`)?.value) || 0;
+    const letterQty  = parseInt(document.getElementById(`r${id}-letter-qty`)?.value || '1');
+    const phoneQty   = parseInt(document.getElementById(`r${id}-phone-qty`)?.value  || '1');
+
+    const kgTotal      = hasKg      ? kgVal    * (c.fee_per_kg  || 0) : 0;
+    const letterTotal  = hasLetter  ? letterQty * (c.letter_fee || 0) : 0;
+    const phoneTotal   = document.getElementById(`r${id}-phone`) && document.getElementById(`r${id}-phone-qty`)
+      ? (parseInt(document.getElementById(`r${id}-phone-qty`)?.value||'0') * (c.phone_fee||0)) : 0;
+    const luggageTotal = hasLuggage ? ((c.luggage_fee || 0) + 200) : 0;
+
+    if (name || hasKg || hasLetter || hasLuggage) {
+      recipients.push({ id, name, phone, area, hasKg, hasLetter, hasLuggage, kgVal, letterQty, kgTotal, letterTotal, luggageTotal });
+    }
+  }
+  return recipients;
+}
+
+
+let bookingType = 'multi'; // kept for compatibility
 function openLuggageDisclaimer() { document.getElementById('luggage-disclaimer-modal').classList.add('open'); }
 function closeLuggageDisclaimer() { document.getElementById('luggage-disclaimer-modal').classList.remove('open'); }
 function acceptLuggageDisclaimer() {
@@ -1226,21 +1325,18 @@ function openBooking(post_id, traveler_name, fee_per_kg, max_kg, letter_fee, pho
   if (luggageLbl2 && luggage_fee) luggageLbl2.textContent = `$${luggage_fee + 200} total`;
   if (luggageTitleEl && luggage_fee) luggageTitleEl.textContent = `Full Luggage — $${luggage_fee + 200} total ($200 bag + $${luggage_fee} fee)`;
 
-  // Uncheck all items on open
-  ['item-kg','item-letter','item-phone','item-luggage'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.checked = false;
-  });
+  // Reset recipients
+  recipientCount = 0;
+  document.getElementById('recipients-container').innerHTML = '';
+  addRecipient(); // start with one recipient card
   document.getElementById('bk-name').value   = '';
   document.getElementById('bk-email').value  = '';
   document.getElementById('bk-phone').value  = '';
   document.getElementById('bk-desc').value   = '';
   document.getElementById('bk-contract-agree').checked = false;
-  ['item-kg','item-letter','item-phone','item-luggage'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.checked = false;
-  });
-  ['item-kg-detail','item-letter-detail','item-phone-detail','item-luggage-detail'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.style.display = 'none';
-  });
+  recipientCount = 0;
+  const rc = document.getElementById('recipients-container');
+  if (rc) rc.innerHTML = '';
   const lda = document.getElementById('luggage-disclaimer-agree');
   if (lda) lda.checked = false; // reset to per-kg mode
   document.getElementById('booking-summary').innerHTML = `
@@ -1326,36 +1422,51 @@ async function processPayment() {
   const phone  = document.getElementById('bk-phone').value.trim();
   const desc   = document.getElementById('bk-desc').value.trim();
 
-  // Multi-item cart — collect all selected items
-  const hasKg      = document.getElementById('item-kg')?.checked;
-  const hasLetter  = document.getElementById('item-letter')?.checked;
-  const hasPhone   = document.getElementById('item-phone')?.checked;
-  const isLuggage  = document.getElementById('item-luggage')?.checked;
+  // Collect all recipients
+  const c = currentBooking;
+  let grandTotal = 0;
+  let totalWeight = 0;
+  const recipientsData = [];
+  let hasAnyLuggage = false;
 
-  if (!hasKg && !hasLetter && !hasPhone && !isLuggage) {
-    showToast('Please select at least one item to send.', true); return;
+  for (let id = 1; id <= recipientCount; id++) {
+    if (!document.getElementById(`recipient-${id}`)) continue;
+    const rName  = document.getElementById(`r${id}-name`)?.value.trim();
+    const rPhone = document.getElementById(`r${id}-phone`)?.value.trim();
+    const rArea  = document.getElementById(`r${id}-area`)?.value.trim();
+    const hasKg  = document.getElementById(`r${id}-kg`)?.checked;
+    const hasLet = document.getElementById(`r${id}-letter`)?.checked;
+    const hasPh  = document.getElementById(`r${id}-phone-chk`)?.checked;
+    const hasLug = document.getElementById(`r${id}-luggage`)?.checked;
+    if (hasLug) hasAnyLuggage = true;
+
+    const kgVal     = hasKg  ? (parseFloat(document.getElementById(`r${id}-kg-val`)?.value)      || 0) : 0;
+    const letterQty = hasLet ? (parseInt(document.getElementById(`r${id}-letter-qty`)?.value)    || 1) : 0;
+    const phoneQty  = hasPh  ? (parseInt(document.getElementById(`r${id}-phone-qty`)?.value)     || 1) : 0;
+    const kgT = kgVal * (c.fee_per_kg||0);
+    const ltT = letterQty * (c.letter_fee||0);
+    const phT = phoneQty  * (c.phone_fee||0);
+    const lgT = hasLug ? ((c.luggage_fee||0) + 200) : 0;
+    const rTotal = kgT + ltT + phT + lgT;
+
+    if (!rName) { showToast(`Please enter a name for Recipient ${id}.`, true); return; }
+    if (rTotal === 0) { showToast(`Please select at least one item for ${rName}.`, true); return; }
+
+    grandTotal  += rTotal;
+    totalWeight += kgVal + (phoneQty * 0.2) + (letterQty * 0.05) + (hasLug ? 23 : 0);
+    recipientsData.push({ id, name: rName, phone: rPhone, area: rArea,
+      kg: hasKg ? kgVal : null, letters: hasLet ? letterQty : null,
+      phones: hasPh ? phoneQty : null, luggage: hasLug,
+      total: rTotal });
   }
-
-  const phoneQty  = hasPhone   ? parseInt(document.getElementById('bk-phone-qty')?.value  || '1') : 0;
-  const letterQty = hasLetter  ? parseInt(document.getElementById('bk-letter-qty')?.value || '1') : 0;
-  const kgVal     = hasKg      ? (parseFloat(document.getElementById('bk-weight')?.value) || 0) : 0;
 
   if (!name || !email) { showToast('Please fill in your name and email.', true); return; }
-  if (hasKg && kgVal <= 0) { showToast('Please enter the package weight.', true); return; }
-  if (hasKg && kgVal > currentBooking.max_kg) {
-    showToast(`Max weight for this traveler is ${currentBooking.max_kg} kg.`, true); return;
-  }
-  if (isLuggage && !document.getElementById('luggage-disclaimer-agree')?.checked) {
-    showToast('Please read and agree to the Full Luggage Disclaimer before booking.', true); return;
+  if (recipientsData.length === 0) { showToast('Please add at least one recipient.', true); return; }
+  if (hasAnyLuggage && !document.getElementById('luggage-disclaimer-agree')?.checked) {
+    showToast('Please agree to the Full Luggage Disclaimer.', true); return;
   }
 
-  const kgTotal      = kgVal     * (currentBooking.fee_per_kg  || 0);
-  const letterTotal  = letterQty * (currentBooking.letter_fee  || 0);
-  const phoneTotal   = phoneQty  * (currentBooking.phone_fee   || 0);
-  const luggageTotal = isLuggage ? ((currentBooking.luggage_fee || 0) + 200) : 0;
-  const totalAmount  = kgTotal + letterTotal + phoneTotal + luggageTotal;
-  const weight       = kgVal + (hasPhone ? phoneQty * 0.2 : 0) + (hasLetter ? letterQty * 0.05 : 0) + (isLuggage ? 23 : 0);
-  const isLetter = hasLetter; const isPhone = hasPhone;
+  const weight = Math.max(totalWeight, 0.1);
   if (!document.getElementById('bk-contract-agree').checked) {
     showToast('Please read and agree to the Shipping Agreement to continue.', true); return;
   }
@@ -1374,16 +1485,11 @@ async function processPayment() {
         sender_name:         name,
         sender_email:        email,
         sender_phone:        phone,
-        package_description: desc,
+        package_description: recipientsData.map(r=>`${r.name} (${r.area||'Monrovia'})`).join(' · '),
         weight_kg:           weight,
         booking_type:        'multi',
-        flat_fee:            (letterTotal + phoneTotal + luggageTotal) || null,
-        items: {
-          kg:      hasKg      ? { weight: kgVal,     fee_per_kg: currentBooking.fee_per_kg, total: kgTotal }      : null,
-          letter:  hasLetter  ? { qty: letterQty,    fee: currentBooking.letter_fee,        total: letterTotal }   : null,
-          phone:   hasPhone   ? { qty: phoneQty,     fee: currentBooking.phone_fee,         total: phoneTotal }    : null,
-          luggage: isLuggage  ? { traveler_fee: currentBooking.luggage_fee, bag_fee: 200,   total: luggageTotal }  : null,
-        },
+        recipients:          recipientsData,
+        flat_fee:            grandTotal > 0 ? grandTotal - (recipientsData.reduce((s,r)=>s+(r.kg?(r.kg*(currentBooking.fee_per_kg||0)):0),0)) : null,
       })
     });
 
@@ -1643,3 +1749,5 @@ window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOSt
 </script>
 </body>
 </html>
+
+ 
