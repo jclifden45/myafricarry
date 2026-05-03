@@ -371,83 +371,8 @@
     <p id="booking-modal-sub">Your payment is held securely in escrow until delivery is confirmed.</p>
     <div class="booking-summary" id="booking-summary"></div>
 
-    <!-- MULTI-ITEM BOOKING CART -->
-    <div class="payment-field">
-      <label>What would you like to send? <span style="color:var(--muted);font-weight:400;font-size:11px;">Select all that apply</span></label>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
-
-        <!-- BY WEIGHT -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <input type="checkbox" id="item-kg" onchange="updateBookingSummary()" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;"/>
-            <label for="item-kg" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;flex:1;">⚖️ By Weight — <span style="color:var(--accent)" id="kg-rate-label">$0/kg</span></label>
-          </div>
-          <div id="item-kg-detail" style="display:none;margin-top:10px;">
-            <input type="number" id="bk-weight" placeholder="e.g. 3 kg" min="0.5" max="30" step="0.5"
-              oninput="updateBookingSummary()"
-              style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;"/>
-          </div>
-        </div>
-
-        <!-- LETTERS -->
-        <div id="letter-item-row" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:none;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <input type="checkbox" id="item-letter" onchange="updateBookingSummary()" style="width:16px;height:16px;accent-color:#60a5fa;cursor:pointer;flex-shrink:0;"/>
-            <label for="item-letter" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;flex:1;">✉ Letters / Envelopes — <span style="color:#60a5fa" id="letter-fee-label2">$0 flat</span></label>
-          </div>
-          <div id="item-letter-detail" style="display:none;margin-top:10px;">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <label style="font-size:11px;color:var(--muted);white-space:nowrap;">Number of letters</label>
-              <select id="bk-letter-qty" onchange="updateBookingSummary()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;">
-                <option value="1">1 letter</option>
-                <option value="2">2 letters</option>
-                <option value="3">3 letters</option>
-                <option value="4">4 letters</option>
-                <option value="5">5 letters</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- PHONES -->
-        <div id="phone-item-row" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:none;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <input type="checkbox" id="item-phone" onchange="updateBookingSummary()" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;"/>
-            <label for="item-phone" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;flex:1;">📱 Cell Phones — <span style="color:var(--green)" id="phone-fee-label2">$0 per phone</span></label>
-          </div>
-          <div id="item-phone-detail" style="display:none;margin-top:10px;">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <label style="font-size:11px;color:var(--muted);white-space:nowrap;">Number of phones</label>
-              <select id="bk-phone-qty" onchange="updateBookingSummary()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;">
-                <option value="1">1 phone</option>
-                <option value="2">2 phones</option>
-              </select>
-            </div>
-            <p style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;">Personal use only. Not for bulk resale. Subject to Liberian customs duties.</p>
-          </div>
-        </div>
-
-        <!-- FULL LUGGAGE -->
-        <div id="luggage-item-row" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:none;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <input type="checkbox" id="item-luggage" onchange="updateBookingSummary()" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0;"/>
-            <label for="item-luggage" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;flex:1;">🧳 Full Luggage — <span style="color:var(--red)" id="luggage-fee-label2">$0 total</span></label>
-          </div>
-          <div id="item-luggage-detail" style="display:none;margin-top:10px;">
-            <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.6;">
-              Includes $200 airline bag fee + traveler fee. <a onclick="openLuggageDisclaimer()" style="color:var(--accent);text-decoration:underline;cursor:pointer;font-weight:700;">Read Full Luggage Disclaimer →</a>
-            </div>
-            <div class="contract-agree" style="margin-top:8px;">
-              <input type="checkbox" id="luggage-disclaimer-agree"/>
-              <label for="luggage-disclaimer-agree" style="font-size:12px;">I have read and agree to the <a onclick="openLuggageDisclaimer()" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Full Luggage Disclaimer</a>. AfriCarryApp is not responsible for any loss, damage, or illegal items.</label>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="payment-field"><label>Your Name (Sender)</label><input type="text" id="bk-name" placeholder="Your full name"/></div>
+    <!-- Items selected per recipient below -->
+        <div class="payment-field"><label>Your Name (Sender)</label><input type="text" id="bk-name" placeholder="Your full name"/></div>
     <div class="payment-field"><label>Your Email</label><input type="email" id="bk-email" placeholder="your@email.com"/></div>
     <div class="payment-field"><label>Your WhatsApp / Phone (optional)</label><input type="text" id="bk-phone" placeholder="+1 xxx xxx xxxx"/></div>
 
@@ -457,19 +382,6 @@
       <div id="recipients-container" style="margin-top:8px;"></div>
       <button class="add-recipient-btn" onclick="addRecipient()">＋ Add Another Recipient</button>
     </div>
-
-    <div id="luggage-field" style="display:none;">
-      <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;">
-        🧳 <strong style="color:var(--red)" id="luggage-field-title">Full Luggage — Total Fee</strong><br/>
-        The sender provides a full packed luggage to the traveler. The total cost includes the <strong style="color:var(--red)">$200 airline checked bag fee</strong> plus the traveler's negotiated fee. The traveler checks this bag at the airline counter dedicated to the sender's contents.
-        <div style="margin-top:10px;padding:10px 12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:12px;line-height:1.7;">
-          ⚠ <strong style="color:var(--red)">IMPORTANT — READ BEFORE BOOKING:</strong><br/>
-          By selecting Full Luggage you confirm you have read and agree to the
-          <a onclick="openLuggageDisclaimer()" style="color:var(--accent);text-decoration:underline;cursor:pointer;font-weight:700;">AfriCarryApp Full Luggage Disclaimer</a>.
-          AfriCarryApp is <strong>not responsible</strong> for any loss, damage, illegal items, or customs seizure of items in the luggage.
-          The traveler and sender are <strong>solely responsible</strong> for all contents.
-        </div>
-      </div>
       <div style="margin-top:10px;">
         <div class="contract-agree">
           <input type="checkbox" id="luggage-disclaimer-agree"/>
@@ -1190,8 +1102,8 @@ function addRecipient() {
 
   const phoneOption = c.phone_fee
     ? `<div class="recipient-item-row">
-        <input type="checkbox" id="r${id}-phone" onchange="updateBookingSummary()"/>
-        <label for="r${id}-phone">📱 Phones</label>
+        <input type="checkbox" id="r${id}-phone-chk" onchange="updateBookingSummary()"/>
+        <label for="r${id}-phone-chk">📱 Phones</label>
         <select id="r${id}-phone-qty" onchange="updateBookingSummary()">
           <option value="1">1</option>
           <option value="2">2</option>
@@ -1227,7 +1139,7 @@ function addRecipient() {
       </div>
       <div class="recipient-field">
         <label>Phone / WhatsApp</label>
-        <input type="text" id="r${id}-phone" placeholder="+231 xxx xxxx"/>
+        <input type="text" id="r${id}-phone-num" placeholder="+231 xxx xxxx"/>
       </div>
       <div class="recipient-field">
         <label>Area in Monrovia</label>
@@ -1260,11 +1172,11 @@ function getRecipients() {
   for (let id = 1; id <= recipientCount; id++) {
     if (!document.getElementById(`recipient-${id}`)) continue;
     const name  = document.getElementById(`r${id}-name`)?.value.trim()  || '';
-    const phone = document.getElementById(`r${id}-phone`)?.value.trim() || '';
+    const phone = document.getElementById(`r${id}-phone-num`)?.value.trim() || '';
     const area  = document.getElementById(`r${id}-area`)?.value.trim()  || '';
     const hasKg      = document.getElementById(`r${id}-kg`)?.checked;
     const hasLetter  = document.getElementById(`r${id}-letter`)?.checked;
-    const hasPhone   = document.getElementById(`r${id}-phone-checkbox`)?.checked || document.getElementById(`r${id}-phone`)?.checked;
+    const hasPhone   = document.getElementById(`r${id}-phone-chk`)?.checked || false;
     const hasLuggage = document.getElementById(`r${id}-luggage`)?.checked;
     const kgVal      = parseFloat(document.getElementById(`r${id}-kg-val`)?.value) || 0;
     const letterQty  = parseInt(document.getElementById(`r${id}-letter-qty`)?.value || '1');
@@ -1285,6 +1197,54 @@ function getRecipients() {
 
 
 let bookingType = 'multi'; // kept for compatibility
+function setBookingType(type) { updateBookingSummary(); }
+
+function updateBookingSummary() {
+  const c = currentBooking;
+  let grandTotal = 0;
+  let rows = `<div class="booking-summary-row"><span>Traveler</span><span>${c.traveler_name||''}</span></div>`;
+  let hasAnyItem = false;
+
+  for (let id = 1; id <= recipientCount; id++) {
+    if (!document.getElementById(`recipient-${id}`)) continue;
+    const rName    = document.getElementById(`r${id}-name`)?.value.trim() || `Recipient ${id}`;
+    const hasKg    = document.getElementById(`r${id}-kg`)?.checked;
+    const hasLetter= document.getElementById(`r${id}-letter`)?.checked;
+    const hasPhone = document.getElementById(`r${id}-phone-chk`)?.checked;
+    const hasLug   = document.getElementById(`r${id}-luggage`)?.checked;
+
+    const kgVal     = hasKg     ? (parseFloat(document.getElementById(`r${id}-kg-val`)?.value)      || 0) : 0;
+    const letterQty = hasLetter ? (parseInt(document.getElementById(`r${id}-letter-qty`)?.value)    || 1) : 0;
+    const phoneQty  = hasPhone  ? (parseInt(document.getElementById(`r${id}-phone-qty`)?.value)     || 1) : 0;
+
+    const kgT  = kgVal     * (c.fee_per_kg  || 0);
+    const ltT  = letterQty * (c.letter_fee  || 0);
+    const phT  = phoneQty  * (c.phone_fee   || 0);
+    const lgT  = hasLug    ? ((c.luggage_fee || 0) + 200) : 0;
+    const rTotal = kgT + ltT + phT + lgT;
+
+    if (rTotal > 0 || hasKg || hasLetter || hasPhone || hasLug) {
+      hasAnyItem = true;
+      grandTotal += rTotal;
+      const items = [];
+      if (hasKg && kgVal > 0)      items.push(`${kgVal}kg`);
+      if (hasLetter && letterQty)  items.push(`${letterQty} letter${letterQty>1?'s':''}`);
+      if (hasPhone  && phoneQty)   items.push(`${phoneQty} phone${phoneQty>1?'s':''}`);
+      if (hasLug)                  items.push('full luggage');
+      rows += `<div class="booking-summary-row"><span>📍 ${rName}${items.length?' — '+items.join(', '):''}</span><span>$${rTotal.toFixed(2)}</span></div>`;
+    }
+  }
+
+  if (hasAnyItem) {
+    const commission = grandTotal * 0.10;
+    rows += `<div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${commission.toFixed(2)}</span></div>`;
+    rows += `<div class="booking-summary-row total"><span><b>Total (escrow)</b></span><span><b>$${grandTotal.toFixed(2)}</b></span></div>`;
+  } else {
+    rows += `<div class="booking-summary-row total"><span>Select items for each recipient to see total</span><span></span></div>`;
+  }
+  const el = document.getElementById('booking-summary');
+  if (el) el.innerHTML = rows;
+}
 function openLuggageDisclaimer() { document.getElementById('luggage-disclaimer-modal').classList.add('open'); }
 function closeLuggageDisclaimer() { document.getElementById('luggage-disclaimer-modal').classList.remove('open'); }
 function acceptLuggageDisclaimer() {
@@ -1332,18 +1292,12 @@ function openBooking(post_id, traveler_name, fee_per_kg, max_kg, letter_fee, pho
   document.getElementById('bk-name').value   = '';
   document.getElementById('bk-email').value  = '';
   document.getElementById('bk-phone').value  = '';
-  document.getElementById('bk-desc').value   = '';
   document.getElementById('bk-contract-agree').checked = false;
-  recipientCount = 0;
-  const rc = document.getElementById('recipients-container');
-  if (rc) rc.innerHTML = '';
   const lda = document.getElementById('luggage-disclaimer-agree');
-  if (lda) lda.checked = false; // reset to per-kg mode
+  if (lda) lda.checked = false;
   document.getElementById('booking-summary').innerHTML = `
     <div class="booking-summary-row"><span>Traveler</span><span>${traveler_name}</span></div>
-    <div class="booking-summary-row"><span>Rate</span><span>$${fee_per_kg}/kg</span></div>
-    <div class="booking-summary-row"><span>Max weight</span><span>${max_kg} kg</span></div>
-    <div class="booking-summary-row total"><span>Enter weight above to see total</span><span></span></div>`;
+    <div class="booking-summary-row total"><span>Add recipients and select items to see total</span><span></span></div>`;
   document.getElementById('booking-modal').classList.add('open');
 
   // Mount Stripe card element
@@ -1367,60 +1321,13 @@ function closeBooking() {
   if (stripeCard) { try { stripeCard.unmount(); } catch(e) {} stripeCard = null; }
 }
 
-function updateBookingSummary() {
-  const fee = currentBooking.fee_per_kg;
-  const letterFee = currentBooking.letter_fee;
-
-  if (bookingType === 'letter') {
-    const total = letterFee || 0;
-    const com   = (total * 0.10).toFixed(2);
-    document.getElementById('booking-summary').innerHTML = `
-      <div class="booking-summary-row"><span>Traveler</span><span>${currentBooking.traveler_name}</span></div>
-      <div class="booking-summary-row"><span>Booking type</span><span style="color:#60a5fa">✉ Letter / Envelope (flat fee)</span></div>
-      <div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${com}</span></div>
-      <div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${total.toFixed(2)}</b></span></div>`;
-  } else if (bookingType === 'luggage') {
-    const lf2    = currentBooking.luggage_fee || 0;
-    const total2 = lf2 + 200;
-    const com2   = (total2 * 0.10).toFixed(2);
-    document.getElementById('booking-summary').innerHTML = `
-      <div class="booking-summary-row"><span>Traveler</span><span>${currentBooking.traveler_name}</span></div>
-      <div class="booking-summary-row"><span>Booking type</span><span style="color:var(--red)">🧳 Full Luggage</span></div>
-      <div class="booking-summary-row deduct"><span>Airline bag fee (non-refundable)</span><span style="color:var(--red)">$200.00</span></div>
-      <div class="booking-summary-row"><span>Traveler fee</span><span>$${lf2.toFixed(2)}</span></div>
-      <div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${com2}</span></div>
-      <div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${total2.toFixed(2)}</b></span></div>`;
-    const phoneFee2 = currentBooking.phone_fee || 0;
-    const qty = parseInt(document.getElementById('bk-phone-qty')?.value || '1');
-    const total = phoneFee * qty;
-    const com   = (total * 0.10).toFixed(2);
-    document.getElementById('booking-summary').innerHTML = `
-      <div class="booking-summary-row"><span>Traveler</span><span>${currentBooking.traveler_name}</span></div>
-      <div class="booking-summary-row"><span>Booking type</span><span style="color:var(--green)">📱 Cell Phone${qty > 1 ? 's' : ''} × ${qty}</span></div>
-      <div class="booking-summary-row"><span>${qty} phone${qty>1?'s':''} × $${phoneFee} each</span><span>$${total.toFixed(2)}</span></div>
-      <div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${com}</span></div>
-      <div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${total.toFixed(2)}</b></span></div>`;
-  } else {
-    const w   = parseFloat(document.getElementById('bk-weight').value) || 0;
-    const sub = (w * fee).toFixed(2);
-    const com = (w * fee * 0.10).toFixed(2);
-    document.getElementById('booking-summary').innerHTML = `
-      <div class="booking-summary-row"><span>Traveler</span><span>${currentBooking.traveler_name}</span></div>
-      <div class="booking-summary-row"><span>Rate</span><span>$${fee}/kg</span></div>
-      ${w > 0 ? `
-      <div class="booking-summary-row"><span>${w} kg × $${fee}/kg</span><span>$${sub}</span></div>
-      <div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${com}</span></div>
-      <div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${sub}</b></span></div>`
-      : `<div class="booking-summary-row total"><span>Enter weight above to see total</span><span></span></div>`}`;
-  }
-}
 
 // ── PROCESS PAYMENT ───────────────────────────────────────
 async function processPayment() {
   const name   = document.getElementById('bk-name').value.trim();
   const email  = document.getElementById('bk-email').value.trim();
   const phone  = document.getElementById('bk-phone').value.trim();
-  const desc   = document.getElementById('bk-desc').value.trim();
+  const desc   = recipientsData.map(r => r.name + (r.area ? ' (' + r.area + ')' : '')).join(', ');
 
   // Collect all recipients
   const c = currentBooking;
@@ -1432,11 +1339,11 @@ async function processPayment() {
   for (let id = 1; id <= recipientCount; id++) {
     if (!document.getElementById(`recipient-${id}`)) continue;
     const rName  = document.getElementById(`r${id}-name`)?.value.trim();
-    const rPhone = document.getElementById(`r${id}-phone`)?.value.trim();
+    const rPhone = document.getElementById(`r${id}-phone-num`)?.value.trim();
     const rArea  = document.getElementById(`r${id}-area`)?.value.trim();
     const hasKg  = document.getElementById(`r${id}-kg`)?.checked;
     const hasLet = document.getElementById(`r${id}-letter`)?.checked;
-    const hasPh  = document.getElementById(`r${id}-phone-chk`)?.checked;
+    const hasPh  = document.getElementById(`r${id}-phone-chk`)?.checked || false;
     const hasLug = document.getElementById(`r${id}-luggage`)?.checked;
     if (hasLug) hasAnyLuggage = true;
 
@@ -1749,5 +1656,3 @@ window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOSt
 </script>
 </body>
 </html>
-
- 
