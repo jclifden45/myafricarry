@@ -21,13 +21,13 @@
 
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); backdrop-filter:blur(5px); z-index:1000; align-items:center; justify-content:center; padding:16px; }
   .modal-overlay.open { display:flex; }
-  .modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; }
+  .modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .modal h2 { font-family:'Playfair Display',serif; font-size:22px; margin-bottom:8px; }
   .modal > p { color:var(--muted); font-size:13px; margin-bottom:20px; line-height:1.6; }
   .modal label { display:block; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; margin-top:14px; }
-  .modal input { width:100%; padding:11px 14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; margin-bottom:4px; }
+  .modal input { width:100%; padding:11px 14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:16px; font-family:'DM Sans',sans-serif; margin-bottom:4px; }
   .modal input:focus { outline:none; border-color:var(--accent); }
-  .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+  .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; flex-wrap:wrap; }
   .btn-save { background:var(--accent); color:#000; border:none; padding:10px 24px; border-radius:10px; font-weight:700; cursor:pointer; font-size:14px; font-family:'DM Sans',sans-serif; }
   .btn-cancel { background:transparent; color:var(--muted); border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-weight:500; cursor:pointer; font-size:14px; font-family:'DM Sans',sans-serif; }
   .btn-save:hover { background:#f0b030; }
@@ -292,6 +292,119 @@
     .card-main { grid-template-columns:1fr; }
     .listing-right { flex-direction:row; align-items:center; }
     .rv-inputs { grid-template-columns:1fr; }
+
+    /* ── MOBILE MODAL ── */
+    .modal-overlay {
+      align-items: flex-end;
+      padding: 0;
+    }
+    .modal {
+      border-radius: 20px 20px 0 0;
+      max-width: 100% !important;
+      width: 100%;
+      max-height: 92vh;
+      padding: 20px 16px 32px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .modal h2 { font-size: 18px; margin-bottom: 6px; }
+    .modal > p { font-size: 12px; margin-bottom: 14px; }
+
+    /* Drag handle */
+    .modal::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    /* ── BOOKING SUMMARY ── */
+    .booking-summary { padding: 10px 12px; }
+    .booking-summary-row { font-size: 12px; }
+    .booking-summary-row.total span { font-size: 14px; }
+
+    /* ── PAYMENT FIELDS ── */
+    .payment-field { margin-bottom: 10px; }
+    .payment-field label { font-size: 11px; }
+    .payment-field input {
+      padding: 13px 14px;
+      font-size: 16px; /* prevents iOS zoom */
+      border-radius: 12px;
+    }
+    #stripe-card-element { padding: 14px; }
+
+    /* ── RECIPIENT CARDS ── */
+    .recipient-grid { grid-template-columns: 1fr; gap: 8px; }
+    .recipient-items { grid-template-columns: 1fr; gap: 8px; }
+    .recipient-item-row {
+      padding: 8px 10px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .recipient-item-row input[type=checkbox] {
+      width: 20px;
+      height: 20px;
+    }
+    .recipient-item-row label { font-size: 13px; }
+    .recipient-item-row select {
+      padding: 6px 8px;
+      font-size: 13px;
+      min-width: 70px;
+    }
+    .recipient-field input {
+      padding: 12px 10px;
+      font-size: 16px; /* prevents iOS zoom */
+    }
+    .add-recipient-btn {
+      padding: 14px;
+      font-size: 14px;
+      border-radius: 12px;
+    }
+
+    /* ── CONFIRM TABS ── */
+    #conf-tab-sender, #conf-tab-traveler {
+      padding: 12px 8px;
+      font-size: 12px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-pay {
+      padding: 16px;
+      font-size: 16px;
+      border-radius: 14px;
+      margin-top: 12px;
+    }
+    .btn-confirm, .btn-dispute {
+      padding: 14px 12px;
+      font-size: 13px;
+    }
+    .confirm-row { gap: 8px; }
+    .modal-actions { margin-top: 14px; }
+    .btn-save, .btn-cancel {
+      padding: 12px 16px;
+      font-size: 14px;
+      flex: 1;
+    }
+    .modal-actions { justify-content: stretch; }
+
+    /* ── CONTRACT BOX ── */
+    .contract-box { padding: 10px 12px; font-size: 11px; }
+    .contract-box ol { padding-left: 14px; }
+    .escrow-note { font-size: 11px; padding: 8px 12px; }
+    .contract-agree label { font-size: 11px; }
+    .contract-agree input[type=checkbox] { width: 20px; height: 20px; }
+
+    /* ── LUGGAGE DISCLAIMER ── */
+    .legal-section p, .legal-section li { font-size: 12px; }
+
+    /* ── MARK COMPLETE MODAL ── */
+    #complete-modal .modal,
+    #luggage-disclaimer-modal .modal,
+    #dispute-modal .modal { padding: 20px 16px 32px; }
   }
 </style>
 </head>
