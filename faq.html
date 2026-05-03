@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AfriCarryApp — FAQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --card: #161e30;
+    --border: #1f2d47;
+    --accent: #e8a020;
+    --accent2: #2563eb;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #f0f4ff;
+    --muted: #8899bb;
+    --star: #f59e0b;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  /* ── HEADER ── */
+  header {
+    padding:18px 40px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--border);
+    background:rgba(10,15,30,0.96);
+    backdrop-filter:blur(12px);
+    position:sticky; top:0; z-index:100;
+  }
+  .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+  .logo-text { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:var(--text); }
+  .logo-text span { color:var(--accent); }
+  .logo-sub { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+  .back-btn {
+    background:transparent; border:1px solid var(--border);
+    color:var(--muted); padding:8px 18px; border-radius:8px;
+    font-size:13px; font-weight:500; cursor:pointer;
+    font-family:'DM Sans',sans-serif; transition:all .2s;
+    text-decoration:none; display:flex; align-items:center; gap:6px;
+  }
+  .back-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* ── HERO ── */
+  .faq-hero {
+    padding:60px 40px 50px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .faq-hero::before {
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 0%, rgba(232,160,32,0.08) 0%, transparent 65%);
+    pointer-events:none;
+  }
+  .faq-eyebrow {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(232,160,32,0.12); border:1px solid rgba(232,160,32,0.25);
+    color:var(--accent); padding:5px 14px; border-radius:20px;
+    font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+    margin-bottom:20px;
+  }
+  .faq-hero h1 {
+    font-family:'Playfair Display',serif;
+    font-size:clamp(32px,5vw,56px);
+    font-weight:900; line-height:1.1; margin-bottom:14px;
+  }
+  .faq-hero h1 em { color:var(--accent); font-style:normal; }
+  .faq-hero p { color:var(--muted); max-width:520px; margin:0 auto 32px; line-height:1.7; font-size:16px; }
+
+  /* ── SEARCH ── */
+  .search-wrap {
+    max-width:480px; margin:0 auto 0;
+    position:relative;
+  }
+  .search-wrap input {
+    width:100%; padding:14px 20px 14px 48px;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; color:var(--text); font-size:15px;
+    font-family:'DM Sans',sans-serif; transition:border .2s;
+    outline:none;
+  }
+  .search-wrap input:focus { border-color:var(--accent); }
+  .search-wrap input::placeholder { color:var(--muted); }
+  .search-icon {
+    position:absolute; left:16px; top:50%; transform:translateY(-50%);
+    font-size:18px; pointer-events:none;
+  }
+
+  /* ── LAYOUT ── */
+  .faq-container {
+    max-width:900px; margin:0 auto; padding:48px 24px 80px;
+    display:grid; grid-template-columns:220px 1fr; gap:40px;
+  }
+
+  /* ── SIDEBAR ── */
+  .faq-sidebar { position:sticky; top:90px; height:fit-content; }
+  .sidebar-title { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; }
+  .cat-btn {
+    display:flex; align-items:center; gap:10px;
+    width:100%; padding:10px 14px; border-radius:10px;
+    background:transparent; border:none; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:13px;
+    color:var(--muted); text-align:left; transition:all .2s;
+    margin-bottom:4px;
+  }
+  .cat-btn:hover { background:var(--card); color:var(--text); }
+  .cat-btn.active { background:rgba(232,160,32,0.12); color:var(--accent); font-weight:600; border:1px solid rgba(232,160,32,0.2); }
+  .cat-icon { font-size:16px; flex-shrink:0; }
+
+  /* ── FAQ CONTENT ── */
+  .faq-content {}
+  .faq-section { margin-bottom:40px; }
+  .faq-section-title {
+    font-family:'Playfair Display',serif;
+    font-size:20px; font-weight:700; color:var(--text);
+    margin-bottom:16px; display:flex; align-items:center; gap:10px;
+  }
+  .faq-section-title span { color:var(--accent); }
+
+  /* ── FAQ ITEM ── */
+  .faq-item {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; margin-bottom:10px;
+    transition:border-color .2s;
+    overflow:hidden;
+  }
+  .faq-item:hover { border-color:rgba(232,160,32,0.3); }
+  .faq-item.open { border-color:rgba(232,160,32,0.4); }
+  .faq-q {
+    width:100%; padding:18px 20px;
+    background:transparent; border:none; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:14px;
+    font-weight:600; color:var(--text); text-align:left;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; transition:color .2s;
+  }
+  .faq-item.open .faq-q { color:var(--accent); }
+  .faq-arrow {
+    width:24px; height:24px; border-radius:50%;
+    background:var(--border); display:flex; align-items:center;
+    justify-content:center; flex-shrink:0; transition:all .25s;
+    font-size:12px; color:var(--muted);
+  }
+  .faq-item.open .faq-arrow {
+    background:var(--accent); color:#000; transform:rotate(180deg);
+  }
+  .faq-a {
+    display:none; padding:0 20px 18px;
+    font-size:14px; color:var(--muted); line-height:1.75;
+  }
+  .faq-a.open { display:block; animation:slideDown .2s ease; }
+  @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+  .faq-a a { color:var(--accent); text-decoration:underline; }
+  .faq-a strong { color:var(--text); }
+  .faq-a ul { padding-left:20px; margin-top:8px; display:flex; flex-direction:column; gap:4px; }
+  .faq-a .highlight {
+    background:rgba(232,160,32,0.08); border:1px solid rgba(232,160,32,0.2);
+    border-radius:8px; padding:10px 14px; margin-top:10px; font-size:13px;
+    color:var(--text); line-height:1.6;
+  }
+  .faq-a .highlight strong { color:var(--accent); }
+
+  /* ── EMPTY STATE ── */
+  .no-results {
+    text-align:center; padding:60px 20px; color:var(--muted);
+    display:none;
+  }
+  .no-results.show { display:block; }
+  .no-results h3 { font-size:18px; color:var(--text); margin-bottom:6px; }
+
+  /* ── CONTACT BANNER ── */
+  .contact-banner {
+    background:linear-gradient(135deg,var(--card),#0d1a2e);
+    border:1px solid rgba(37,99,235,0.3);
+    border-radius:14px; padding:24px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap; margin-top:20px;
+  }
+  .contact-left h3 { font-size:16px; font-weight:600; margin-bottom:4px; }
+  .contact-left p { font-size:13px; color:var(--muted); }
+  .contact-btn {
+    background:var(--accent2); color:#fff;
+    border:none; padding:11px 24px; border-radius:10px;
+    font-weight:700; font-size:14px; cursor:pointer;
+    font-family:'DM Sans',sans-serif; text-decoration:none;
+    transition:all .2s; white-space:nowrap;
+  }
+  .contact-btn:hover { background:#1d4ed8; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top:1px solid var(--border); background:var(--surface);
+    padding:24px 40px; display:flex; align-items:center;
+    justify-content:space-between; flex-wrap:wrap; gap:12px;
+  }
+  .footer-links { display:flex; gap:20px; flex-wrap:wrap; }
+  .footer-links a { font-size:12px; color:var(--muted); text-decoration:none; transition:color .2s; }
+  .footer-links a:hover { color:var(--accent); }
+  .footer-copy { font-size:12px; color:var(--muted); }
+
+  /* ── NO MATCH HIGHLIGHT ── */
+  .faq-item.hidden { display:none; }
+  mark { background:rgba(232,160,32,0.25); color:var(--accent); border-radius:2px; padding:0 2px; }
+
+  @media(max-width:700px) {
+    header { padding:14px 16px; }
+    .faq-hero { padding:40px 16px 30px; }
+    .faq-container { grid-template-columns:1fr; gap:20px; }
+    .faq-sidebar { position:static; display:flex; gap:8px; flex-wrap:wrap; }
+    .sidebar-title { display:none; }
+    .cat-btn { padding:7px 12px; font-size:12px; }
+    footer { padding:18px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    <svg width="36" height="24" viewBox="0 0 36 24" style="border-radius:4px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.4)">
+      <rect width="36" height="24" fill="#BF0000"/>
+      <rect y="2.18" width="36" height="2.18" fill="white"/>
+      <rect y="6.54" width="36" height="2.18" fill="white"/>
+      <rect y="10.91" width="36" height="2.18" fill="white"/>
+      <rect y="15.27" width="36" height="2.18" fill="white"/>
+      <rect y="19.63" width="36" height="2.18" fill="white"/>
+      <rect width="15" height="13" fill="#002868"/>
+      <polygon points="7.5,2 8.7,5.8 12.6,5.8 9.4,8.2 10.6,12 7.5,9.7 4.4,12 5.6,8.2 2.4,5.8 6.3,5.8" fill="white"/>
+    </svg>
+    <div>
+      <div class="logo-text">AfriCarry<span>App</span></div>
+      <div class="logo-sub">Fly & Carry Mail</div>
+    </div>
+  </a>
+  <a href="index.html" class="back-btn">← Back to App</a>
+</header>
+
+<section class="faq-hero">
+  <div class="faq-eyebrow">❓ Help Center</div>
+  <h1>Frequently Asked <em>Questions</em></h1>
+  <p>Everything you need to know about AfriCarryApp — for senders and travelers alike.</p>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="faq-search" placeholder="Search questions..." oninput="searchFAQ(this.value)"/>
+  </div>
+</section>
+
+<div class="faq-container">
+
+  <!-- SIDEBAR -->
+  <aside class="faq-sidebar">
+    <div class="sidebar-title">Categories</div>
+    <button class="cat-btn active" onclick="filterCat('all', this)"><span class="cat-icon">📋</span> All Questions</button>
+    <button class="cat-btn" onclick="filterCat('general', this)"><span class="cat-icon">✈</span> General</button>
+    <button class="cat-btn" onclick="filterCat('senders', this)"><span class="cat-icon">📦</span> For Senders</button>
+    <button class="cat-btn" onclick="filterCat('travelers', this)"><span class="cat-icon">🧳</span> For Travelers</button>
+    <button class="cat-btn" onclick="filterCat('payments', this)"><span class="cat-icon">💳</span> Payments</button>
+    <button class="cat-btn" onclick="filterCat('safety', this)"><span class="cat-icon">🔒</span> Safety & Legal</button>
+    <button class="cat-btn" onclick="filterCat('delivery', this)"><span class="cat-icon">📍</span> Delivery</button>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="faq-content" id="faq-content">
+
+    <!-- GENERAL -->
+    <div class="faq-section" data-cat="general">
+      <div class="faq-section-title">✈ <span>General</span></div>
+
+      <div class="faq-item" data-cat="general">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          What is AfriCarryApp?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          AfriCarryApp is a community-powered marketplace that connects <strong>Liberians traveling by air</strong> with <strong>senders who need to ship packages to Liberia</strong> affordably. Travelers post their travel dates and offer to carry packages for a fee. Senders browse available travelers and book a shipment — typically saving 60–70% compared to DHL or FedEx.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="general">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How is AfriCarryApp different from DHL or FedEx?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Traditional couriers charge $15–25 per kg to ship to Liberia. AfriCarryApp uses travelers who already have luggage space to carry packages for $8–15 per kg — significantly cheaper. The key differences:
+          <ul>
+            <li><strong>Price:</strong> Up to 70% cheaper than DHL</li>
+            <li><strong>Speed:</strong> Door-to-door in 5–14 days vs 10–21 days</li>
+            <li><strong>Trust:</strong> Community ratings and reviews on every traveler</li>
+            <li><strong>Protection:</strong> Escrow payments — your money held until delivery confirmed</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="general">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Which countries does AfriCarryApp currently serve?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          AfriCarryApp currently serves <strong>Liberia</strong> — specifically Monrovia via Roberts International Airport (ROB) and Spriggs Payne Airport (MLW). We are actively planning expansion to Ghana, Nigeria, Kenya, and Sierra Leone. Stay tuned!
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="general">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Is AfriCarryApp free to join?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Yes — completely free to sign up and browse. AfriCarryApp only charges a <strong>10% platform commission</strong> when a shipment is booked and paid. There are no monthly fees, no listing fees, and no charges just to use the platform.
+        </div>
+      </div>
+    </div>
+
+    <!-- SENDERS -->
+    <div class="faq-section" data-cat="senders">
+      <div class="faq-section-title">📦 <span>For Senders</span></div>
+
+      <div class="faq-item" data-cat="senders">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How do I send a package through AfriCarryApp?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          It is simple:
+          <ul>
+            <li><strong>1.</strong> Browse available travelers heading to Liberia</li>
+            <li><strong>2.</strong> Check their ratings, reviews, travel date, and fee per kg</li>
+            <li><strong>3.</strong> Click <strong>"Book &amp; Pay Securely"</strong> on their listing</li>
+            <li><strong>4.</strong> Enter your package details and pay via Stripe (card or Apple/Google Pay)</li>
+            <li><strong>5.</strong> Arrange to hand over your package before the travel date</li>
+            <li><strong>6.</strong> Confirm delivery when your recipient receives it — payment releases to the traveler</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="senders">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          What can I send through AfriCarryApp?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <strong>Allowed items include:</strong>
+          <ul>
+            <li>Documents, letters, and envelopes</li>
+            <li>Clothing, shoes, and personal effects</li>
+            <li>Over-the-counter medications (sealed, original packaging)</li>
+            <li>Vitamins and supplements</li>
+            <li>Non-perishable food items (sealed commercial packaging)</li>
+            <li>Electronics for personal use</li>
+          </ul>
+          <div class="highlight">
+            ⚠ <strong>Prohibited:</strong> Prescription medications belonging to another person, controlled substances, firearms, counterfeit goods, live animals, currency exceeding $10,000 USD, or any item prohibited by US or Liberian customs law. See our full <a href="#">Terms of Use</a>.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="senders">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          What is the "Entire Extra Bag" option?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          The <strong>Entire Extra Bag</strong> option is a flat fee of <strong>$175</strong>. The traveler dedicates their full extra checked bag — up to 23kg — exclusively to your shipment. This is ideal if you have a lot to send and want to fill an entire bag without calculating per-kg costs. Your payment is still held in escrow until delivery is confirmed.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="senders">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How do I hand over my package to the traveler?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Once your booking is confirmed and payment is held in escrow, the traveler's contact details become visible to you. You arrange directly with the traveler to hand over the package — typically at a convenient meeting point before their departure date. Always get a receipt or confirmation from the traveler when handing over.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="senders">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How do I compare AfriCarryApp prices to DHL?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Every traveler listing has a <strong>"vs DHL rates ↗"</strong> link that opens the DHL rate calculator. Enter the same origin, destination, weight, and dimensions to get a DHL quote. You can then compare directly — AfriCarryApp is typically 60–70% cheaper for packages to Liberia.
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAVELERS -->
+    <div class="faq-section" data-cat="travelers">
+      <div class="faq-section-title">🧳 <span>For Travelers</span></div>
+
+      <div class="faq-item" data-cat="travelers">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How do I post my trip and start earning?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <ul>
+            <li><strong>1.</strong> Go to <strong>"Post Your Trip"</strong> on the app</li>
+            <li><strong>2.</strong> Enter your departure city, travel date, fee per kg, and max weight you can carry</li>
+            <li><strong>3.</strong> Agree to the Terms of Use and Prohibited Items Policy</li>
+            <li><strong>4.</strong> Click <strong>"Post Trip"</strong> — your listing goes live immediately</li>
+            <li><strong>5.</strong> Set up your Stripe payout account to receive payments</li>
+            <li><strong>6.</strong> Senders will find you, book, and pay — you carry, deliver, and get paid</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="travelers">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How much can I earn per trip?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          It depends on how much cargo space you offer and your rate per kg. A typical example:
+          <div class="highlight">
+            <strong>Brussels Airlines (2 free bags = 46kg total)</strong><br/>
+            Offering 25kg at $12/kg = <strong>$300 gross</strong><br/>
+            After AfriCarryApp 10% commission + Stripe fee = <strong>~$248 net</strong><br/>
+            That is extra income just from your existing luggage allowance.
+          </div>
+          Many travelers earn $150–$375 per trip depending on their airline, how much space they offer, and their rate.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="travelers">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Is it legal to carry packages for others?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Yes — carrying packages for others is legal as long as the contents comply with customs laws. You are legally responsible for declaring all items you carry at customs. <strong>You must never carry prohibited items</strong> including another person's prescription medication, controlled substances, weapons, or cash exceeding $10,000. Always know what is in the packages you carry. If in doubt, do not carry it.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="travelers">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          What airlines fly from the US to Liberia?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Common routes include:
+          <ul>
+            <li><strong>Brussels Airlines</strong> — via Brussels (BRU) — includes 2 free bags (46kg)</li>
+            <li><strong>Delta Air Lines</strong> — via connecting city — includes 2 free bags on Africa routes</li>
+            <li><strong>United Airlines</strong> — via connecting city — bag policy varies by fare</li>
+            <li><strong>Air Maroc</strong> — via Casablanca</li>
+            <li><strong>Kenya Airways</strong> — via Nairobi</li>
+          </ul>
+          <div class="highlight">
+            💡 <strong>Tip:</strong> Brussels Airlines offers the best earning potential — 2 free bags (46kg total) included on all US–Africa routes. Zero extra bag cost = maximum profit.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="travelers">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How do I set up my payout account?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Click <strong>"Set Up Payouts"</strong> on your traveler listing. This opens Stripe's onboarding flow where you securely enter your bank account details. Stripe verifies your identity (government ID required) and links your bank. Once approved, you will see a <strong>"Payouts Enabled ✓"</strong> badge on your profile. Payouts are sent to your bank account within 2–7 business days after delivery confirmation.
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="faq-section" data-cat="payments">
+      <div class="faq-section-title">💳 <span>Payments &amp; Escrow</span></div>
+
+      <div class="faq-item" data-cat="payments">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How does the escrow payment system work?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Escrow protects both senders and travelers:
+          <ul>
+            <li><strong>Sender pays</strong> → money is held securely by AfriCarryApp</li>
+            <li><strong>Traveler carries</strong> the package and delivers it in Liberia</li>
+            <li><strong>Sender confirms delivery</strong> → AfriCarryApp releases 90% to the traveler</li>
+            <li>If no confirmation is received within <strong>7 days</strong> of the travel date, funds are released automatically</li>
+          </ul>
+          This means the traveler only gets paid after successful delivery, and the sender's money is protected throughout.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="payments">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          What payment methods are accepted?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          AfriCarryApp accepts all major payment methods through <strong>Stripe</strong>:
+          <ul>
+            <li>Visa, Mastercard, American Express, Discover</li>
+            <li>Apple Pay and Google Pay</li>
+            <li>Debit cards</li>
+          </ul>
+          All payments are encrypted and processed securely. AfriCarryApp never stores your card details.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="payments">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          What is the AfriCarryApp commission?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          AfriCarryApp charges a <strong>10% platform commission</strong> on every shipment. This is automatically deducted from the total payment before the traveler receives their payout.
+          <div class="highlight">
+            <strong>Example:</strong> Sender pays $120 for a 10kg shipment at $12/kg.<br/>
+            AfriCarryApp keeps: $12 (10%)<br/>
+            Stripe processing fee: ~$3.78<br/>
+            Traveler receives: ~$104.22
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="payments">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          When does the traveler get paid?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          The traveler receives their payout via Stripe within <strong>2–7 business days</strong> after one of the following:
+          <ul>
+            <li>The sender clicks <strong>"Confirm Delivery"</strong> in the app</li>
+            <li><strong>7 days</strong> after the travel date passes with no dispute raised</li>
+          </ul>
+          Payouts go directly to the traveler's linked bank account.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="payments">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Can I get a refund?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Yes — in the following circumstances:
+          <ul>
+            <li><strong>Traveler cancels their trip</strong> before departure — full refund issued automatically</li>
+            <li><strong>Package not delivered</strong> — raise a dispute within 48 hours of expected delivery. Our team will investigate and issue a refund if the claim is valid.</li>
+            <li><strong>Package damaged</strong> — raise a dispute with photos for evidence. Partial or full refund depending on outcome.</li>
+          </ul>
+          Refunds are processed back to your original payment method within 5–10 business days.
+        </div>
+      </div>
+    </div>
+
+    <!-- SAFETY -->
+    <div class="faq-section" data-cat="safety">
+      <div class="faq-section-title">🔒 <span>Safety &amp; Legal</span></div>
+
+      <div class="faq-item" data-cat="safety">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Is AfriCarryApp safe to use?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Yes. AfriCarryApp has multiple layers of protection:
+          <ul>
+            <li><strong>Escrow payments</strong> — your money is never released until delivery is confirmed</li>
+            <li><strong>Community reviews</strong> — read what other senders say before booking a traveler</li>
+            <li><strong>Verified travelers</strong> — Stripe identity verification required for all payout accounts</li>
+            <li><strong>Digital contracts</strong> — both parties agree to binding terms at the time of booking</li>
+            <li><strong>Dispute resolution</strong> — our team reviews disputes within 48 hours</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="safety">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Can I carry prescription medication for someone else?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <strong>No.</strong> Carrying another person's prescription medication is potentially illegal and is strictly prohibited on AfriCarryApp. It can be classified as drug trafficking under US and Liberian law regardless of intent. <strong>Travelers may only carry their own prescription medication</strong> in the original labeled bottle for personal use. Violating this policy will result in immediate account suspension.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="safety">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          What happens if my package is seized at customs?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Senders are legally responsible for declaring the correct value and contents of all items. Travelers must declare all items carried on behalf of others at customs. AfriCarryApp is not responsible for items seized, fined, or confiscated by customs authorities. Always ensure your package complies with US and Liberian customs regulations before shipping.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="safety">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How is my personal data protected?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          AfriCarryApp takes data security seriously:
+          <ul>
+            <li>All payments processed through <strong>Stripe</strong> — PCI-DSS compliant</li>
+            <li>Database protected by <strong>Supabase Row Level Security</strong> — users only see data they are authorized to access</li>
+            <li>Contact information only revealed to the other party <strong>after payment is confirmed</strong></li>
+            <li>We never sell your personal data to third parties</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELIVERY -->
+    <div class="faq-section" data-cat="delivery">
+      <div class="faq-section-title">📍 <span>Delivery</span></div>
+
+      <div class="faq-item" data-cat="delivery">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How long does delivery take?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Delivery time depends on when you find a traveler heading to Liberia. Once a traveler is booked:
+          <ul>
+            <li><strong>Hand-off:</strong> Before the traveler's departure date</li>
+            <li><strong>In-flight:</strong> Direct or connecting flights — typically 10–20 hours</li>
+            <li><strong>Local delivery in Liberia:</strong> 1–3 days after arrival depending on recipient location</li>
+          </ul>
+          <strong>Total time: typically 5–14 days</strong> from booking to delivery — faster than most traditional couriers.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="delivery">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          How do I confirm delivery?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Once your recipient confirms they have received the package, go to the <strong>footer of the app</strong> and click <strong>"✅ Confirm Delivery"</strong>. Enter your email and booking ID. Click <strong>"Yes, Delivered"</strong> — this releases the traveler's payment immediately. You have <strong>48 hours</strong> after expected delivery to raise a dispute if needed.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="delivery">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          What if the traveler cancels their trip?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          If a traveler cancels their trip before departure, your payment is <strong>fully refunded</strong> automatically. You will receive an email notification and the refund will appear on your original payment method within 5–10 business days. You can then search for another available traveler on the platform.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="delivery">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Is there a storage fee if my recipient does not collect on time?
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          Yes. If items are not collected on the day the traveler arrives in Liberia, the following daily storage fees apply:
+          <ul>
+            <li><strong>$10 USD per day</strong> for full luggage</li>
+            <li><strong>$5 USD per day</strong> for letters and packages</li>
+          </ul>
+          These fees are charged to the sender and deducted from the escrow balance before the traveler receives their payout.
+          <div class="highlight">
+            <strong>Example:</strong> Traveler arrives Monday. Recipient collects Wednesday (2 days late).<br/>
+            — 1 package uncollected: 2 × $5 = <strong>$10 storage fee</strong><br/>
+            — 1 full luggage uncollected: 2 × $10 = <strong>$20 storage fee</strong><br/><br/>
+            <strong>Tip:</strong> Notify your recipient of the exact arrival date as soon as the traveler posts their trip. AfriCarryApp reserves the right to arrange return or disposal of items uncollected after 7 days.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="delivery">
+          <span class="faq-arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          If your package was not delivered, arrived damaged, or something else went wrong:
+          <ul>
+            <li>Click <strong>"✅ Confirm Delivery"</strong> in the footer</li>
+            <li>Enter your email and booking ID</li>
+            <li>Click <strong>"⚠ Raise Dispute"</strong> instead of confirming</li>
+            <li>Select the reason and describe what happened</li>
+            <li>Our team will review within <strong>48 hours</strong> and contact both parties</li>
+          </ul>
+          You must raise a dispute within <strong>48 hours</strong> of the expected delivery date.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="no-results" id="no-results">
+      <div style="font-size:48px;margin-bottom:12px">🔍</div>
+      <h3>No results found</h3>
+      <p>Try different keywords or <a href="mailto:support@africarryapp.com" style="color:var(--accent)">contact our support team</a>.</p>
+    </div>
+
+    <!-- CONTACT BANNER -->
+    <div class="contact-banner">
+      <div class="contact-left">
+        <h3>Still have questions?</h3>
+        <p>Our support team typically responds within 24 hours.</p>
+      </div>
+      <a href="mailto:support@africarryapp.com" class="contact-btn">✉ Contact Support</a>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="index.html">← Back to App</a>
+    <a href="#">📋 Terms of Use</a>
+    <a href="#">🚫 Prohibited Items</a>
+    <a href="https://www.dhl.com/us-en/home/get-a-quote.html" target="_blank">DHL Rate Calculator</a>
+  </div>
+  <div class="footer-copy">© 2026 AfriCarryApp. All rights reserved.</div>
+</footer>
+
+<script>
+// ── TOGGLE FAQ ITEM ──
+function toggleFAQ(btn) {
+  const item = btn.parentElement;
+  const answer = item.querySelector('.faq-a');
+  const isOpen = item.classList.contains('open');
+
+  // Close all others
+  document.querySelectorAll('.faq-item.open').forEach(el => {
+    el.classList.remove('open');
+    el.querySelector('.faq-a').classList.remove('open');
+  });
+
+  if (!isOpen) {
+    item.classList.add('open');
+    answer.classList.add('open');
+  }
+}
+
+// ── CATEGORY FILTER ──
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('faq-search').value = '';
+
+  document.querySelectorAll('.faq-section').forEach(sec => {
+    sec.style.display = (cat === 'all' || sec.dataset.cat === cat) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.classList.remove('hidden');
+  });
+  document.getElementById('no-results').classList.remove('show');
+}
+
+// ── SEARCH ──
+function searchFAQ(query) {
+  const q = query.trim().toLowerCase();
+
+  // Reset category buttons
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.cat-btn').classList.add('active');
+  document.querySelectorAll('.faq-section').forEach(s => s.style.display = 'block');
+
+  if (!q) {
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.classList.remove('hidden');
+      // Restore original text
+      item.querySelector('.faq-q').innerHTML =
+        item.querySelector('.faq-q').innerHTML.replace(/<mark>/g,'').replace(/<\/mark>/g,'');
+    });
+    document.getElementById('no-results').classList.remove('show');
+    return;
+  }
+
+  let anyVisible = false;
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const qText  = item.querySelector('.faq-q').textContent.toLowerCase();
+    const aText  = item.querySelector('.faq-a').textContent.toLowerCase();
+    const match  = qText.includes(q) || aText.includes(q);
+    item.classList.toggle('hidden', !match);
+    if (match) anyVisible = true;
+  });
+
+  // Hide empty sections
+  document.querySelectorAll('.faq-section').forEach(sec => {
+    const hasVisible = [...sec.querySelectorAll('.faq-item')].some(i => !i.classList.contains('hidden'));
+    sec.style.display = hasVisible ? 'block' : 'none';
+  });
+
+  document.getElementById('no-results').classList.toggle('show', !anyVisible);
+}
+
+// ── OPEN FIRST ITEM BY DEFAULT ──
+window.addEventListener('DOMContentLoaded', () => {
+  const first = document.querySelector('.faq-item');
+  if (first) {
+    first.classList.add('open');
+    first.querySelector('.faq-a').classList.add('open');
+  }
+});
+</script>
+</body>
+</html>
