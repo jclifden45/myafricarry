@@ -352,58 +352,86 @@
     <p id="booking-modal-sub">Your payment is held securely in escrow until delivery is confirmed.</p>
     <div class="booking-summary" id="booking-summary"></div>
 
-    <!-- BOOKING TYPE SELECTOR -->
+    <!-- MULTI-ITEM BOOKING CART -->
     <div class="payment-field">
-      <label>Booking Type</label>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:4px;">
-        <button id="type-btn-kg"      class="type-btn type-btn-active" onclick="setBookingType('kg')">
-          ⚖️ <strong style="font-size:11px;">By Weight</strong><br/><span style="font-size:10px;font-weight:400;">Per kg</span>
-        </button>
-        <button id="type-btn-letter"  class="type-btn" onclick="setBookingType('letter')" style="display:none;">
-          ✉ <strong style="font-size:11px;">Letter</strong><br/><span id="letter-fee-label" style="font-size:10px;font-weight:400;">Flat fee</span>
-        </button>
-        <button id="type-btn-phone"   class="type-btn" onclick="setBookingType('phone')" style="display:none;">
-          📱 <strong style="font-size:11px;">Phone</strong><br/><span id="phone-fee-label" style="font-size:10px;font-weight:400;">Flat fee</span>
-        </button>
-        <button id="type-btn-luggage" class="type-btn" onclick="setBookingType('luggage')" style="display:none;">
-          🧳 <strong style="font-size:11px;">Full Luggage</strong><br/><span id="luggage-fee-label" style="font-size:10px;font-weight:400;">Flat fee</span>
-        </button>
+      <label>What would you like to send? <span style="color:var(--muted);font-weight:400;font-size:11px;">Select all that apply</span></label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+
+        <!-- BY WEIGHT -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="item-kg" onchange="updateBookingSummary()" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;"/>
+            <label for="item-kg" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;flex:1;">⚖️ By Weight — <span style="color:var(--accent)" id="kg-rate-label">$0/kg</span></label>
+          </div>
+          <div id="item-kg-detail" style="display:none;margin-top:10px;">
+            <input type="number" id="bk-weight" placeholder="e.g. 3 kg" min="0.5" max="30" step="0.5"
+              oninput="updateBookingSummary()"
+              style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;"/>
+          </div>
+        </div>
+
+        <!-- LETTERS -->
+        <div id="letter-item-row" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:none;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="item-letter" onchange="updateBookingSummary()" style="width:16px;height:16px;accent-color:#60a5fa;cursor:pointer;flex-shrink:0;"/>
+            <label for="item-letter" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;flex:1;">✉ Letters / Envelopes — <span style="color:#60a5fa" id="letter-fee-label2">$0 flat</span></label>
+          </div>
+          <div id="item-letter-detail" style="display:none;margin-top:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <label style="font-size:11px;color:var(--muted);white-space:nowrap;">Number of letters</label>
+              <select id="bk-letter-qty" onchange="updateBookingSummary()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;">
+                <option value="1">1 letter</option>
+                <option value="2">2 letters</option>
+                <option value="3">3 letters</option>
+                <option value="4">4 letters</option>
+                <option value="5">5 letters</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHONES -->
+        <div id="phone-item-row" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:none;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="item-phone" onchange="updateBookingSummary()" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;"/>
+            <label for="item-phone" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;flex:1;">📱 Cell Phones — <span style="color:var(--green)" id="phone-fee-label2">$0 per phone</span></label>
+          </div>
+          <div id="item-phone-detail" style="display:none;margin-top:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <label style="font-size:11px;color:var(--muted);white-space:nowrap;">Number of phones</label>
+              <select id="bk-phone-qty" onchange="updateBookingSummary()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;">
+                <option value="1">1 phone</option>
+                <option value="2">2 phones</option>
+              </select>
+            </div>
+            <p style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;">Personal use only. Not for bulk resale. Subject to Liberian customs duties.</p>
+          </div>
+        </div>
+
+        <!-- FULL LUGGAGE -->
+        <div id="luggage-item-row" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:none;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="item-luggage" onchange="updateBookingSummary()" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0;"/>
+            <label for="item-luggage" style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer;flex:1;">🧳 Full Luggage — <span style="color:var(--red)" id="luggage-fee-label2">$0 total</span></label>
+          </div>
+          <div id="item-luggage-detail" style="display:none;margin-top:10px;">
+            <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.6;">
+              Includes $200 airline bag fee + traveler fee. <a onclick="openLuggageDisclaimer()" style="color:var(--accent);text-decoration:underline;cursor:pointer;font-weight:700;">Read Full Luggage Disclaimer →</a>
+            </div>
+            <div class="contract-agree" style="margin-top:8px;">
+              <input type="checkbox" id="luggage-disclaimer-agree"/>
+              <label for="luggage-disclaimer-agree" style="font-size:12px;">I have read and agree to the <a onclick="openLuggageDisclaimer()" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Full Luggage Disclaimer</a>. AfriCarryApp is not responsible for any loss, damage, or illegal items.</label>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
     <div class="payment-field"><label>Your Name</label><input type="text" id="bk-name" placeholder="Full name"/></div>
     <div class="payment-field"><label>Your Email</label><input type="email" id="bk-email" placeholder="your@email.com"/></div>
     <div class="payment-field"><label>WhatsApp / Phone (optional)</label><input type="text" id="bk-phone" placeholder="+1 xxx xxx xxxx"/></div>
-    <div class="payment-field"><label>Package Description</label><input type="text" id="bk-desc" placeholder="e.g. Clothing, documents, vitamins"/></div>
-
-    <!-- PER KG WEIGHT INPUT (shown for kg bookings) -->
-    <div id="weight-field" class="payment-field">
-      <label>Weight (kg)</label>
-      <input type="number" id="bk-weight" placeholder="e.g. 3" min="0.5" max="30" step="0.5" oninput="updateBookingSummary()"/>
-    </div>
-
-    <!-- ENTIRE BAG NOTE (shown for bag bookings) -->
-
-    <div id="letter-field" style="display:none;">
-      <div style="background:rgba(37,99,235,0.07);border:1px solid rgba(37,99,235,0.25);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;">
-        ✉ <strong style="color:#60a5fa" id="letter-field-title">Letter / Envelope — Flat Fee</strong><br/>
-        The traveler carries your letter or envelope at a fixed flat rate set by them. Suitable for standard letters, greeting cards, and thin documents. <strong>No packages.</strong> Contents must comply with customs laws.
-      </div>
-    </div>
-
-    <div id="phone-field" style="display:none;">
-      <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;">
-        📱 <strong style="color:var(--green)" id="phone-field-title">Cell Phone — Flat Fee per Device</strong><br/>
-        The traveler carries your cell phone at a fixed flat rate per device. Phones must be new or used personal devices — <strong>not for commercial resale in bulk</strong>. Subject to Liberian customs duties. Max 2 phones per booking. Contents must comply with customs laws.
-      </div>
-      <div style="margin-top:10px;display:flex;align-items:center;gap:12px;">
-        <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;">Number of phones</label>
-        <select id="bk-phone-qty" onchange="updateBookingSummary()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;">
-          <option value="1">1 phone</option>
-          <option value="2">2 phones</option>
-        </select>
-      </div>
-    </div>
+    <div class="payment-field"><label>Package Description</label><input type="text" id="bk-desc" placeholder="e.g. Clothing, letters, vitamins, phones"/></div>
 
     <div id="luggage-field" style="display:none;">
       <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;">
@@ -1108,19 +1136,54 @@ let stripeCard     = null;
 let currentBooking = { post_id: null, traveler_name: '', fee_per_kg: 0, max_kg: 0, letter_fee: null, phone_fee: null, luggage_fee: null };
 let activeBookingId = null;
 
-let bookingType = 'kg'; // 'kg' or 'bag'
+// ── MULTI-ITEM BOOKING CART ───────────────────────────────
+let bookingType = 'multi'; // kept for compatibility
+function setBookingType(type) { updateBookingSummary(); }
 
-function setBookingType(type) {
-  bookingType = type;
-  document.getElementById('weight-field').style.display   = type === 'kg'      ? 'flex'  : 'none';
-  document.getElementById('letter-field').style.display   = type === 'letter'  ? 'block' : 'none';
-  document.getElementById('phone-field').style.display    = type === 'phone'   ? 'block' : 'none';
-  document.getElementById('luggage-field').style.display  = type === 'luggage' ? 'block' : 'none';
-  document.getElementById('type-btn-kg').classList.toggle('type-btn-active',      type === 'kg');
-  const lb = document.getElementById('type-btn-letter');  if (lb) lb.classList.toggle('type-btn-active',  type === 'letter');
-  const pb = document.getElementById('type-btn-phone');   if (pb) pb.classList.toggle('type-btn-active',  type === 'phone');
-  const ub = document.getElementById('type-btn-luggage'); if (ub) ub.classList.toggle('type-btn-active',  type === 'luggage');
-  updateBookingSummary();
+function updateBookingSummary() {
+  const c = currentBooking;
+  const hasKg      = document.getElementById('item-kg')?.checked;
+  const hasLetter  = document.getElementById('item-letter')?.checked;
+  const hasPhone   = document.getElementById('item-phone')?.checked;
+  const hasLuggage = document.getElementById('item-luggage')?.checked;
+
+  const kgDetail = document.getElementById('item-kg-detail');
+  const ltDetail = document.getElementById('item-letter-detail');
+  const phDetail = document.getElementById('item-phone-detail');
+  const lgDetail = document.getElementById('item-luggage-detail');
+  if (kgDetail) kgDetail.style.display = hasKg      ? 'block' : 'none';
+  if (ltDetail) ltDetail.style.display = hasLetter  ? 'block' : 'none';
+  if (phDetail) phDetail.style.display = hasPhone   ? 'block' : 'none';
+  if (lgDetail) lgDetail.style.display = hasLuggage ? 'block' : 'none';
+
+  const w         = hasKg      ? (parseFloat(document.getElementById('bk-weight')?.value)      || 0) : 0;
+  const letterQty = hasLetter  ? parseInt(document.getElementById('bk-letter-qty')?.value      || '1') : 0;
+  const phoneQty  = hasPhone   ? parseInt(document.getElementById('bk-phone-qty')?.value       || '1') : 0;
+
+  const kgTotal      = w         * (c.fee_per_kg  || 0);
+  const letterTotal  = letterQty * (c.letter_fee  || 0);
+  const phoneTotal   = phoneQty  * (c.phone_fee   || 0);
+  const luggageTotal = hasLuggage ? ((c.luggage_fee || 0) + 200) : 0;
+  const subtotal     = kgTotal + letterTotal + phoneTotal + luggageTotal;
+  const commission   = subtotal * 0.10;
+
+  let rows = `<div class="booking-summary-row"><span>Traveler</span><span>${c.traveler_name}</span></div>`;
+  if (hasKg && w > 0)
+    rows += `<div class="booking-summary-row"><span>⚖️ ${w}kg × $${c.fee_per_kg}/kg</span><span>$${kgTotal.toFixed(2)}</span></div>`;
+  if (hasLetter && letterQty > 0)
+    rows += `<div class="booking-summary-row"><span>✉ ${letterQty} letter${letterQty>1?'s':''} × $${c.letter_fee}</span><span>$${letterTotal.toFixed(2)}</span></div>`;
+  if (hasPhone && phoneQty > 0)
+    rows += `<div class="booking-summary-row"><span>📱 ${phoneQty} phone${phoneQty>1?'s':''} × $${c.phone_fee}</span><span>$${phoneTotal.toFixed(2)}</span></div>`;
+  if (hasLuggage)
+    rows += `<div class="booking-summary-row"><span>🧳 Full luggage ($200 bag + $${c.luggage_fee} fee)</span><span>$${luggageTotal.toFixed(2)}</span></div>`;
+
+  if (subtotal > 0) {
+    rows += `<div class="booking-summary-row commission"><span>AfriCarryApp commission (10%)</span><span>-$${commission.toFixed(2)}</span></div>`;
+    rows += `<div class="booking-summary-row total"><span><b>You pay (escrow)</b></span><span><b>$${subtotal.toFixed(2)}</b></span></div>`;
+  } else {
+    rows += `<div class="booking-summary-row total"><span>Select items above to see total</span><span></span></div>`;
+  }
+  document.getElementById('booking-summary').innerHTML = rows;
 }
 
 function openLuggageDisclaimer() { document.getElementById('luggage-disclaimer-modal').classList.add('open'); }
@@ -1142,58 +1205,44 @@ function openBooking(post_id, traveler_name, fee_per_kg, max_kg, letter_fee, pho
   document.getElementById('booking-modal-sub').textContent =
     `Booking with ${traveler_name} — $${fee_per_kg}/kg`;
 
-  // Letter button
-  const letterBtn   = document.getElementById('type-btn-letter');
-  const letterLabel = document.getElementById('letter-fee-label');
-  const letterTitle = document.getElementById('letter-field-title');
-  if (letterBtn) {
-    if (letter_fee) {
-      letterBtn.style.display = 'block';
-      if (letterLabel) letterLabel.textContent = `Flat fee — $${letter_fee}`;
-      if (letterTitle) letterTitle.textContent = `Letter / Envelope — $${letter_fee} flat fee`;
-    } else {
-      letterBtn.style.display = 'none';
-    }
-  }
+  // Update cart row labels and visibility
+  const kgLbl = document.getElementById('kg-rate-label');
+  if (kgLbl) kgLbl.textContent = `$${fee_per_kg}/kg`;
 
-  // Phone button
-  const phoneBtn   = document.getElementById('type-btn-phone');
-  const phoneLabel = document.getElementById('phone-fee-label');
-  const phoneTitle = document.getElementById('phone-field-title');
-  if (phoneBtn) {
-    if (phone_fee) {
-      phoneBtn.style.display = 'block';
-      if (phoneLabel) phoneLabel.textContent = `Flat fee — $${phone_fee}`;
-      if (phoneTitle) phoneTitle.textContent = `Cell Phone — $${phone_fee} flat fee per device`;
-    } else {
-      phoneBtn.style.display = 'none';
-    }
-  }
-  // Luggage button
-  const luggageBtn   = document.getElementById('type-btn-luggage');
-  const luggageLabel = document.getElementById('luggage-fee-label');
-  const luggageTitle = document.getElementById('luggage-field-title');
-  if (luggageBtn) {
-    if (luggage_fee) {
-      luggageBtn.style.display = 'block';
-      const total = luggage_fee + 200;
-      if (luggageLabel) luggageLabel.textContent = `$${total} total ($200 bag + $${luggage_fee})`;
-      if (luggageTitle) luggageTitle.textContent = `Full Luggage — $${total} total ($200 airline bag fee + $${luggage_fee} traveler fee)`;
-    } else {
-      luggageBtn.style.display = 'none';
-    }
-  }
+  const letterRow = document.getElementById('letter-item-row');
+  const letterLbl2 = document.getElementById('letter-fee-label2');
+  if (letterRow) letterRow.style.display = letter_fee ? 'block' : 'none';
+  if (letterLbl2 && letter_fee) letterLbl2.textContent = `$${letter_fee} flat`;
+
+  const phoneRow = document.getElementById('phone-item-row');
+  const phoneLbl2 = document.getElementById('phone-fee-label2');
+  if (phoneRow) phoneRow.style.display = phone_fee ? 'block' : 'none';
+  if (phoneLbl2 && phone_fee) phoneLbl2.textContent = `$${phone_fee} per phone`;
+
+  const luggageRow = document.getElementById('luggage-item-row');
+  const luggageLbl2 = document.getElementById('luggage-fee-label2');
+  const luggageTitleEl = document.getElementById('luggage-field-title');
+  if (luggageRow) luggageRow.style.display = luggage_fee ? 'block' : 'none';
+  if (luggageLbl2 && luggage_fee) luggageLbl2.textContent = `$${luggage_fee + 200} total`;
+  if (luggageTitleEl && luggage_fee) luggageTitleEl.textContent = `Full Luggage — $${luggage_fee + 200} total ($200 bag + $${luggage_fee} fee)`;
+
+  // Uncheck all items on open
+  ['item-kg','item-letter','item-phone','item-luggage'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.checked = false;
+  });
   document.getElementById('bk-name').value   = '';
   document.getElementById('bk-email').value  = '';
   document.getElementById('bk-phone').value  = '';
   document.getElementById('bk-desc').value   = '';
   document.getElementById('bk-contract-agree').checked = false;
-  document.getElementById('letter-field').style.display  = 'none';
-  document.getElementById('phone-field').style.display   = 'none';
-  document.getElementById('luggage-field').style.display = 'none';
+  ['item-kg','item-letter','item-phone','item-luggage'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.checked = false;
+  });
+  ['item-kg-detail','item-letter-detail','item-phone-detail','item-luggage-detail'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
   const lda = document.getElementById('luggage-disclaimer-agree');
-  if (lda) lda.checked = false;
-  setBookingType('kg'); // reset to per-kg mode
+  if (lda) lda.checked = false; // reset to per-kg mode
   document.getElementById('booking-summary').innerHTML = `
     <div class="booking-summary-row"><span>Traveler</span><span>${traveler_name}</span></div>
     <div class="booking-summary-row"><span>Rate</span><span>$${fee_per_kg}/kg</span></div>
@@ -1277,21 +1326,36 @@ async function processPayment() {
   const phone  = document.getElementById('bk-phone').value.trim();
   const desc   = document.getElementById('bk-desc').value.trim();
 
-  // Determine weight and amount based on booking type
-  const isLetter  = bookingType === 'letter';
-  const isPhone   = bookingType === 'phone';
-  const isLuggage = bookingType === 'luggage';
-  const phoneQty  = isPhone ? parseInt(document.getElementById('bk-phone-qty')?.value || '1') : 0;
-  const weight    =isLetter ? 0.1 : isPhone ? phoneQty * 0.2 : isLuggage ? 23 : parseFloat(document.getElementById('bk-weight').value);
+  // Multi-item cart — collect all selected items
+  const hasKg      = document.getElementById('item-kg')?.checked;
+  const hasLetter  = document.getElementById('item-letter')?.checked;
+  const hasPhone   = document.getElementById('item-phone')?.checked;
+  const isLuggage  = document.getElementById('item-luggage')?.checked;
+
+  if (!hasKg && !hasLetter && !hasPhone && !isLuggage) {
+    showToast('Please select at least one item to send.', true); return;
+  }
+
+  const phoneQty  = hasPhone   ? parseInt(document.getElementById('bk-phone-qty')?.value  || '1') : 0;
+  const letterQty = hasLetter  ? parseInt(document.getElementById('bk-letter-qty')?.value || '1') : 0;
+  const kgVal     = hasKg      ? (parseFloat(document.getElementById('bk-weight')?.value) || 0) : 0;
 
   if (!name || !email) { showToast('Please fill in your name and email.', true); return; }
-  if (!isLetter && !isPhone && !isLuggage && (!weight || weight <= 0)) { showToast('Please enter the package weight.', true); return; }
-  if (!isLetter && !isPhone && !isLuggage && weight > currentBooking.max_kg) {
+  if (hasKg && kgVal <= 0) { showToast('Please enter the package weight.', true); return; }
+  if (hasKg && kgVal > currentBooking.max_kg) {
     showToast(`Max weight for this traveler is ${currentBooking.max_kg} kg.`, true); return;
   }
-  if (isLuggage && !document.getElementById('luggage-disclaimer-agree').checked) {
+  if (isLuggage && !document.getElementById('luggage-disclaimer-agree')?.checked) {
     showToast('Please read and agree to the Full Luggage Disclaimer before booking.', true); return;
   }
+
+  const kgTotal      = kgVal     * (currentBooking.fee_per_kg  || 0);
+  const letterTotal  = letterQty * (currentBooking.letter_fee  || 0);
+  const phoneTotal   = phoneQty  * (currentBooking.phone_fee   || 0);
+  const luggageTotal = isLuggage ? ((currentBooking.luggage_fee || 0) + 200) : 0;
+  const totalAmount  = kgTotal + letterTotal + phoneTotal + luggageTotal;
+  const weight       = kgVal + (hasPhone ? phoneQty * 0.2 : 0) + (hasLetter ? letterQty * 0.05 : 0) + (isLuggage ? 23 : 0);
+  const isLetter = hasLetter; const isPhone = hasPhone;
   if (!document.getElementById('bk-contract-agree').checked) {
     showToast('Please read and agree to the Shipping Agreement to continue.', true); return;
   }
@@ -1312,8 +1376,14 @@ async function processPayment() {
         sender_phone:        phone,
         package_description: desc,
         weight_kg:           weight,
-        booking_type:        bookingType,
-        flat_fee: isLetter ? currentBooking.letter_fee : isPhone ? (currentBooking.phone_fee * phoneQty) : isLuggage ? (currentBooking.luggage_fee + 200) : null,
+        booking_type:        'multi',
+        flat_fee:            (letterTotal + phoneTotal + luggageTotal) || null,
+        items: {
+          kg:      hasKg      ? { weight: kgVal,     fee_per_kg: currentBooking.fee_per_kg, total: kgTotal }      : null,
+          letter:  hasLetter  ? { qty: letterQty,    fee: currentBooking.letter_fee,        total: letterTotal }   : null,
+          phone:   hasPhone   ? { qty: phoneQty,     fee: currentBooking.phone_fee,         total: phoneTotal }    : null,
+          luggage: isLuggage  ? { traveler_fee: currentBooking.luggage_fee, bag_fee: 200,   total: luggageTotal }  : null,
+        },
       })
     });
 
