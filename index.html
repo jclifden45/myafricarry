@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
 <title>AfriCarryApp — Fly & Carry</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -981,8 +984,24 @@ const DEMO_R = {
 /* ── SUPABASE ── */
 function initSB(){
   const u=localStorage.getItem(SB_URL_K), k=localStorage.getItem(SB_KEY_K);
-  if(u&&k){try{sb=window.supabase.createClient(u,k);document.getElementById('setup-banner').style.display='none';return true;}catch(e){}}
-  // Fetch credentials from secure backend
+  if(u&&k){
+    try{
+      sb=window.supabase.createClient(u,k);
+      document.getElementById('setup-banner').style.display='none';
+      // Quick connection test
+      sb.from('travel_posts').select('id', {count:'exact',head:true})
+        .then(({error, count})=>{
+          if(error) {
+            console.error('Supabase connection test failed:', error);
+            showToast('Database connection error: ' + error.message, true);
+          } else {
+            console.log('✓ Supabase connected —', count, 'trips in database');
+          }
+        });
+      return true;
+    }catch(e){ console.error('Supabase init error:', e); }
+  }
+  // Fetch credentials from backend
   fetch('/api/config')
     .then(r=>r.json())
     .then(d=>{
@@ -992,9 +1011,11 @@ function initSB(){
         sb=window.supabase.createClient(d.url,d.key);
         document.getElementById('setup-banner').style.display='none';
         loadAll();
+      } else {
+        console.warn('No Supabase credentials returned from /api/config');
       }
     })
-    .catch(()=>{}); // Falls back to demo mode if backend not available
+    .catch(err=>{ console.warn('Could not fetch config:', err); });
   return false;
 }
 function openLegal(){document.getElementById('legal-modal').classList.add('open');}
@@ -1043,9 +1064,21 @@ async function submitPost(){
     posts=[{...rec,id:Date.now(),created_at:new Date().toISOString()},...posts];
     renderFiltered();updateStats();clearPF();btn.disabled=false;btn.innerHTML='✈ Post Trip';showToast('✓ Trip posted! (Demo mode)');return;
   }
-  const{error}=await sb.from('travel_posts').insert([rec]);
+  const{data:inserted, error}=await sb.from('travel_posts').insert([rec]).select();
   btn.disabled=false;btn.innerHTML='✈ Post Trip';
-  if(error){showToast('Error: '+error.message,true);}else{clearPF();loadAll();showToast('✓ Trip posted!');}
+  if(error){
+    console.error('Supabase insert error:', error);
+    // Give specific helpful error messages
+    let msg = error.message;
+    if(error.code === '23502') msg = 'Missing required field: ' + error.message;
+    else if(error.code === '42501') msg = 'Permission denied — check Supabase RLS policies';
+    else if(error.code === '23505') msg = 'Duplicate entry — this trip may already exist';
+    else if(error.message?.includes('JWT')) msg = 'Session expired — please refresh the page';
+    showToast('Could not save: ' + msg, true);
+  } else {
+    console.log('Trip saved successfully:', inserted);
+    clearPF();loadAll();showToast('✓ Trip posted!');
+  }
 }
 function clearPF(){
   ['f-name','f-contact','f-origin','f-origin-liberia','f-date','f-return','f-fee','f-maxkg','f-letterfee','f-phonefee','f-luggagefee','f-notes','f-dest-us'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
@@ -1071,7 +1104,10 @@ async function submitReview(pid){
   }
   const{error}=await sb.from('reviews').insert([rec]);
   btn.disabled=false;btn.textContent='Post Review';
-  if(error){showToast('Error: '+error.message,true);}else{loadAll();showToast('✓ Review posted!');}
+  if(error){
+    console.error('Review insert error:', error);
+    showToast('Could not save review: '+error.message,true);
+  }else{loadAll();showToast('✓ Review posted!');}
 }
 
 /* ── HELPERS ── */
@@ -1901,4 +1937,5 @@ window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOSt
 </script>
 </body>
 </html>
+
 
