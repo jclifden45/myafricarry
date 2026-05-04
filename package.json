@@ -1,8 +1,8 @@
 {
   "name": "africarryapp",
   "version": "1.0.0",
-  "description": "AfriCarryApp — Peer-to-peer mail delivery marketplace",
-  "main": "index.html",
+  "description": "AfriCarryApp — Peer-to-peer package delivery marketplace",
+  "type": "module",
   "scripts": {
     "dev": "vercel dev"
   },
