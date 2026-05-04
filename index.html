@@ -297,25 +297,26 @@
     .modal-overlay {
       align-items: flex-end;
       padding: 0;
-      /* Fix iOS - overlay must be scrollable container */
       overflow: hidden;
     }
     .modal {
       border-radius: 20px 20px 0 0;
       max-width: 100% !important;
       width: 100%;
-      /* Use dvh for iOS Safari dynamic viewport */
-      height: 90dvh;
-      height: 90vh; /* fallback */
-      max-height: 90dvh;
-      max-height: 90vh;
-      padding: 20px 16px 40px;
-      /* Critical scroll fixes for iOS */
-      overflow-y: scroll !important;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      /* Prevent content from being hidden under home bar */
-      padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
+      height: 92dvh;
+      height: 92vh;
+      max-height: 92dvh;
+      max-height: 92vh;
+      padding: 16px 16px 0;
+      overflow: hidden !important;
+      display: flex;
+      flex-direction: column;
+      /* safe area for iPhone home bar */
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    /* The inner scrollable div gets the scroll */
+    .modal > div[style*="flex:1"] {
+      padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
     }
     .modal h2 { font-size: 18px; margin-bottom: 6px; }
     .modal > p { font-size: 12px; margin-bottom: 14px; }
@@ -489,61 +490,96 @@
 
 <!-- BOOKING MODAL -->
 <div class="modal-overlay" id="booking-modal">
-  <div class="modal booking">
-    <h2>📦 Book Shipment</h2>
-    <p id="booking-modal-sub">Your payment is held securely in escrow until delivery is confirmed.</p>
-    <div class="booking-summary" id="booking-summary"></div>
+  <div class="modal booking" style="display:flex;flex-direction:column;">
 
-    <!-- Items selected per recipient below -->
-        <div class="payment-field"><label>Your Name (Sender)</label><input type="text" id="bk-name" placeholder="Your full name"/></div>
-    <div class="payment-field"><label>Your Email</label><input type="email" id="bk-email" placeholder="your@email.com"/></div>
-    <div class="payment-field"><label>Your WhatsApp / Phone (optional)</label><input type="text" id="bk-phone" placeholder="+1 xxx xxx xxxx"/></div>
+    <!-- HEADER -->
+    <h2 style="flex-shrink:0;">📦 Book Shipment</h2>
+    <p id="booking-modal-sub" style="flex-shrink:0;">Payment held securely in escrow until delivery confirmed.</p>
 
-    <!-- RECIPIENTS -->
-    <div class="payment-field">
-      <label>Recipients in Liberia <span style="color:var(--muted);font-weight:400;font-size:11px;">— add one per person</span></label>
-      <div id="recipients-container" style="margin-top:8px;"></div>
-      <button class="add-recipient-btn" onclick="addRecipient()">＋ Add Another Recipient</button>
-    </div>
-      <div style="margin-top:10px;">
+    <!-- SCROLLABLE BODY -->
+    <div style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-right:4px;">
+
+      <!-- BOOKING SUMMARY -->
+      <div class="booking-summary" id="booking-summary">
+        <div class="booking-summary-row total"><span>Select items for each recipient to see total</span><span></span></div>
+      </div>
+
+      <!-- SENDER DETAILS -->
+      <div class="payment-field">
+        <label>Your Name</label>
+        <input type="text" id="bk-name" placeholder="Your full name" autocomplete="name"/>
+      </div>
+      <div class="payment-field">
+        <label>Your Email</label>
+        <input type="email" id="bk-email" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="payment-field">
+        <label>Your WhatsApp / Phone <span style="color:var(--muted);font-weight:400;font-size:10px;">optional</span></label>
+        <input type="tel" id="bk-phone" placeholder="+1 xxx xxx xxxx" autocomplete="tel"/>
+      </div>
+
+      <!-- RECIPIENTS -->
+      <div class="payment-field">
+        <label>Recipients in Liberia <span style="color:var(--muted);font-weight:400;font-size:11px;">— one card per person</span></label>
+        <div id="recipients-container" style="margin-top:8px;"></div>
+        <button class="add-recipient-btn" onclick="addRecipient()">＋ Add Another Recipient</button>
+      </div>
+
+      <!-- LUGGAGE DISCLAIMER CHECKBOX (shown only when luggage selected) -->
+      <div id="luggage-agree-section" style="display:none;margin-bottom:10px;">
         <div class="contract-agree">
           <input type="checkbox" id="luggage-disclaimer-agree"/>
-          <label for="luggage-disclaimer-agree">I have read the <a onclick="openLuggageDisclaimer()" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Full Luggage Disclaimer</a>. I confirm I am aware of <strong>all contents</strong> in the luggage. I understand AfriCarryApp is <strong>not responsible</strong> for any loss, damage, illegal items, or customs issues.</label>
+          <label for="luggage-disclaimer-agree">I have read the <a onclick="openLuggageDisclaimer()" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Full Luggage Disclaimer</a>. AfriCarryApp is not responsible for any loss, damage, or illegal items.</label>
         </div>
       </div>
-    </div>
 
-    <div class="escrow-note">🔒 Payment held in escrow — released only after both parties confirm delivery.</div>
-    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);margin:8px 0;line-height:1.5;">
-      📦 <strong style="color:var(--red)">Storage fees:</strong> $10/day for luggage · $5/day for letters &amp; packages if uncollected on arrival day.
-    </div>
-    <details style="margin:8px 0;">
-      <summary style="font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;padding:10px 14px;background:rgba(232,160,32,0.04);border:1px solid rgba(232,160,32,0.2);border-radius:10px;list-style:none;display:flex;justify-content:space-between;align-items:center;">
-        📄 Shipping Agreement <span style="font-size:10px;font-weight:400;color:var(--muted);">tap to read ▾</span>
-      </summary>
-      <div class="contract-box" style="border-radius:0 0 10px 10px;margin-top:-1px;border-top:none;">
-        <ol>
-          <li>Sender confirms all items comply with US, Liberian, and international customs laws.</li>
-          <li>Traveler agrees to carry the package safely and deliver it to the recipient.</li>
-          <li>Payment is held in escrow until delivery is confirmed by the sender.</li>
-          <li>Sender has 48 hours after expected delivery to raise a dispute.</li>
-          <li>Neither party may transport prohibited items per AfriCarryApp Terms of Use.</li>
-          <li>AfriCarryApp retains a 10% platform commission.</li>
-          <li>Storage fees apply for uncollected items: $10/day for luggage, $5/day for packages.</li>
-          <li>This agreement is legally binding upon payment confirmation.</li>
-        </ol>
+      <!-- ESCROW + STORAGE NOTICE -->
+      <div class="escrow-note">🔒 Payment held in escrow — released only after both parties confirm delivery.</div>
+      <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);margin:8px 0;line-height:1.5;">
+        📦 <strong style="color:var(--red)">Storage fees:</strong> $10/day for luggage · $5/day for letters &amp; packages if uncollected on arrival day.
       </div>
-    </details>
-    <div class="contract-agree">
-      <input type="checkbox" id="bk-contract-agree"/>
-      <label for="bk-contract-agree">I agree to the <strong>Shipping Agreement</strong>. My package contents are legal and comply with all customs laws.</label>
-    </div>
-    <div class="payment-field"><label>Card Details</label>
-      <div id="stripe-card-element"></div>
-      <div id="stripe-card-errors" style="color:var(--red);font-size:12px;margin-top:6px;"></div>
-    </div>
-    <button class="btn-pay" id="btn-pay" onclick="processPayment()">🔒 Pay &amp; Book Securely</button>
-    <div class="modal-actions" style="margin-top:12px;"><button class="btn-cancel" onclick="closeBooking()">Cancel</button></div>
+
+      <!-- SHIPPING AGREEMENT — COLLAPSIBLE -->
+      <details style="margin:8px 0;">
+        <summary style="font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;padding:10px 14px;background:rgba(232,160,32,0.04);border:1px solid rgba(232,160,32,0.2);border-radius:10px;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+          📄 Shipping Agreement <span style="font-size:10px;font-weight:400;color:var(--muted);">tap to read ▾</span>
+        </summary>
+        <div class="contract-box" style="border-radius:0 0 10px 10px;margin-top:-1px;border-top:none;">
+          <ol>
+            <li>Sender confirms all items comply with US, Liberian, and international customs laws.</li>
+            <li>Traveler agrees to carry the package safely and deliver it to the recipient.</li>
+            <li>Payment is held in escrow until delivery is confirmed by the sender.</li>
+            <li>Sender has 48 hours after expected delivery to raise a dispute.</li>
+            <li>Neither party may transport prohibited items per AfriCarryApp Terms of Use.</li>
+            <li>AfriCarryApp retains a 10% platform commission.</li>
+            <li>Storage fees apply for uncollected items: $10/day luggage, $5/day packages.</li>
+            <li>This agreement is legally binding upon payment confirmation.</li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- AGREEMENT CHECKBOX -->
+      <div class="contract-agree" style="margin-bottom:12px;">
+        <input type="checkbox" id="bk-contract-agree"/>
+        <label for="bk-contract-agree">I agree to the <strong>Shipping Agreement</strong>. My package contents are legal and comply with all customs laws.</label>
+      </div>
+
+      <!-- CARD PAYMENT -->
+      <div class="payment-field">
+        <label>Card Details</label>
+        <div id="stripe-card-element"></div>
+        <div id="stripe-card-errors" style="color:var(--red);font-size:12px;margin-top:6px;"></div>
+      </div>
+
+      <!-- PAY BUTTON -->
+      <button class="btn-pay" id="btn-pay" onclick="processPayment()">🔒 Pay &amp; Book Securely</button>
+
+      <!-- CANCEL -->
+      <div class="modal-actions" style="margin-top:8px;">
+        <button class="btn-cancel" onclick="closeBooking()" style="width:100%;text-align:center;">Cancel</button>
+      </div>
+
+    </div><!-- end scrollable body -->
   </div>
 </div>
 
@@ -1247,7 +1283,7 @@ function addRecipient() {
 
   const luggageOption = c.luggage_fee
     ? `<div class="recipient-item-row" style="grid-column:span 2;">
-        <input type="checkbox" id="r${id}-luggage" onchange="updateBookingSummary()"/>
+        <input type="checkbox" id="r${id}-luggage" onchange="updateBookingSummary();toggleLuggageAgree()"/>
         <label for="r${id}-luggage">🧳 Full Luggage ($${c.luggage_fee + 200})</label>
       </div>` : '';
 
@@ -1285,6 +1321,13 @@ function addRecipient() {
 
   document.getElementById('recipients-container').appendChild(card);
   updateBookingSummary();
+}
+
+function toggleLuggageAgree() {
+  const hasLuggage = Array.from({length: recipientCount}, (_,i)=>i+1)
+    .some(id => document.getElementById(`r${id}-luggage`)?.checked);
+  const sec = document.getElementById('luggage-agree-section');
+  if (sec) sec.style.display = hasLuggage ? 'block' : 'none';
 }
 
 function removeRecipient(id) {
@@ -1783,5 +1826,3 @@ window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOSt
 </script>
 </body>
 </html>
-
-
