@@ -819,9 +819,9 @@
 </header>
 
 <section class="hero">
-  <div class="hero-eyebrow">✈ Monrovia · Roberts International Airport</div>
-  <h1>Traveling to <em>Africa?</em><br>Carry Mail, Earn Money.</h1>
-  <p>Connect with travelers flying to Liberia. Post your dates, set your fee, read real community reviews, and help your community.</p>
+  <div class="hero-eyebrow">✈ US ↔ Liberia · Community Shipping Network</div>
+  <h1>Traveling to <em>Liberia?</em><br>Or heading <em>back to the US?</em></h1>
+  <p>Connect with travelers flying between the US and Liberia. Post your dates, set your fee, and help the diaspora community ship affordably in both directions.</p>
   <div class="hero-cta">
     <button class="cta-primary" onclick="scrollToPost()">✈ Post My Travel Dates</button>
     <a href="https://www.dhl.com/us-en/home/get-a-quote.html" target="_blank" class="cta-secondary">
@@ -840,18 +840,40 @@
 <div class="container">
   <section id="post-section">
     <h2 class="section-title">Post Your Trip</h2>
-    <p class="section-sub">Flying to Liberia? Let the community know — earn extra on your journey.</p>
+    <p class="section-sub" id="post-section-sub">Traveling between the US and Liberia? Post your dates and earn extra on your journey.</p>
 
     <div class="post-form" id="post-form-section">
+
+      <!-- DIRECTION TOGGLE -->
+      <div class="field" style="margin-bottom:20px;">
+        <label>Trip Direction</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;">
+          <button type="button" id="dir-btn-to-liberia" class="type-btn type-btn-active" onclick="setTripDirection('to_liberia')" style="padding:12px;text-align:center;">
+            🇺🇸 ✈ 🇱🇷<strong style="display:block;font-size:12px;margin-top:4px;">US → Liberia</strong>
+            <span style="font-size:10px;font-weight:400;color:var(--muted);">I'm flying to Monrovia</span>
+          </button>
+          <button type="button" id="dir-btn-to-us" class="type-btn" onclick="setTripDirection('to_us')" style="padding:12px;text-align:center;">
+            🇱🇷 ✈ 🇺🇸<strong style="display:block;font-size:12px;margin-top:4px;">Liberia → US</strong>
+            <span style="font-size:10px;font-weight:400;color:var(--muted);">I'm flying back to the US</span>
+          </button>
+        </div>
+      </div>
+
       <div class="form-grid">
         <div class="field"><label>Your Name</label><input type="text" id="f-name" placeholder="Full name"/></div>
         <div class="field"><label>Contact (Email or WhatsApp)</label><input type="text" id="f-contact" placeholder="email@example.com or +1 xxx xxx xxxx"/></div>
-        <div class="field"><label>Departure City / Airport</label><input type="text" id="f-origin" placeholder="e.g. New York (JFK)"/></div>
-        <div class="field"><label>Destination in Liberia</label>
+        <div class="field">
+          <label id="f-origin-label">Departure City / Airport (US)</label>
+          <input type="text" id="f-origin" placeholder="e.g. New York (JFK)"/>
+          <input type="text" id="f-origin-liberia" placeholder="e.g. Monrovia (ROB)" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;width:100%;margin-top:4px;"/>
+        </div>
+        <div class="field">
+          <label id="f-dest-label">Destination in Liberia</label>
           <select id="f-dest" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;">
             <option value="Monrovia (ROB)">Monrovia — Roberts Intl Airport (ROB)</option>
             <option value="Monrovia (MLW)">Monrovia — Spriggs Payne Airport (MLW)</option>
           </select>
+          <input type="text" id="f-dest-us" placeholder="e.g. Washington DC (IAD)" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;width:100%;margin-top:4px;"/>
         </div>
         <div class="field"><label>Travel Date</label><input type="date" id="f-date"/></div>
         <div class="field"><label>Return Date (optional)</label><input type="date" id="f-return"/></div>
@@ -875,7 +897,12 @@
 
   <section id="listings-section">
     <h2 class="section-title">Available Travelers</h2>
-    <p class="section-sub">Browse travelers heading to Liberia. Read reviews from past senders before reaching out.</p>
+    <p class="section-sub">Browse travelers flying between the US and Liberia.</p>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <button class="filter-btn active" id="dir-filter-all"      onclick="setDirFilter('all',this)">🌍 Both Directions</button>
+      <button class="filter-btn"        id="dir-filter-to_liberia" onclick="setDirFilter('to_liberia',this)">🇺🇸 → 🇱🇷 US to Liberia</button>
+      <button class="filter-btn"        id="dir-filter-to_us"    onclick="setDirFilter('to_us',this)">🇱🇷 → 🇺🇸 Liberia to US</button>
+    </div>
     <div class="filters" id="filter-bar">
       <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
       <button class="filter-btn" onclick="setFilter('upcoming',this)">Upcoming</button>
@@ -928,9 +955,11 @@ let sb = null, curFilter = 'all', posts = [], reviews = {};
 
 /* ── DEMO DATA ── */
 const DEMO_P = [
-  {id:1,name:'James K. Freeman',contact:'jfreeman@gmail.com',origin:'New York (JFK)',destination:'Monrovia (ROB)',travel_date:'2026-03-25',return_date:'2026-04-10',fee_per_kg:12,max_kg:8,letter_fee:5,phone_fee:25,luggage_fee:150,notes:'Happy to carry documents and small packages. Contact via email.',created_at:new Date().toISOString()},
-  {id:2,name:'Fatima Kollie',contact:'+1 (347) 555-0192',origin:'Washington DC (IAD)',destination:'Monrovia (ROB)',travel_date:'2026-03-29',return_date:null,fee_per_kg:15,max_kg:5,letter_fee:8,phone_fee:30,luggage_fee:200,notes:'Flying Brussels Airlines via Brussels. No perishables.',created_at:new Date().toISOString()},
-  {id:3,name:'Emmanuel Zahn',contact:'emzahn@yahoo.com',origin:'Atlanta (ATL)',destination:'Monrovia (ROB)',travel_date:'2026-04-05',return_date:'2026-04-20',fee_per_kg:10,max_kg:10,letter_fee:null,phone_fee:20,luggage_fee:null,notes:'Can carry documents, clothes, electronics. WhatsApp preferred.',created_at:new Date().toISOString()},
+  {id:1,name:'James K. Freeman',contact:'jfreeman@gmail.com',origin:'New York (JFK)',destination:'Monrovia (ROB)',direction:'to_liberia',travel_date:'2026-03-25',return_date:'2026-04-10',fee_per_kg:12,max_kg:8,letter_fee:5,phone_fee:25,luggage_fee:150,notes:'Happy to carry documents and small packages. Contact via email.',created_at:new Date().toISOString()},
+  {id:2,name:'Fatima Kollie',contact:'+1 (347) 555-0192',origin:'Washington DC (IAD)',destination:'Monrovia (ROB)',direction:'to_liberia',travel_date:'2026-03-29',return_date:null,fee_per_kg:15,max_kg:5,letter_fee:8,phone_fee:30,luggage_fee:200,notes:'Flying Brussels Airlines via Brussels. No perishables.',created_at:new Date().toISOString()},
+  {id:3,name:'Emmanuel Zahn',contact:'emzahn@yahoo.com',origin:'Atlanta (ATL)',destination:'Monrovia (ROB)',direction:'to_liberia',travel_date:'2026-04-05',return_date:'2026-04-20',fee_per_kg:10,max_kg:10,letter_fee:null,phone_fee:20,luggage_fee:null,notes:'Can carry documents, clothes, electronics. WhatsApp preferred.',created_at:new Date().toISOString()},
+  {id:4,name:'Mary Togba',contact:'marytogba@gmail.com',origin:'Monrovia (ROB)',destination:'Washington DC (IAD)',direction:'to_us',travel_date:'2026-04-08',return_date:null,fee_per_kg:14,max_kg:10,letter_fee:6,phone_fee:null,luggage_fee:null,notes:'Flying back to DC. Can carry letters, documents, and packages from Liberia to the US.',created_at:new Date().toISOString()},
+  {id:5,name:'Samuel Pewee',contact:'+1 (404) 555-0311',origin:'Monrovia (MLW)',destination:'Atlanta (ATL)',direction:'to_us',travel_date:'2026-04-12',return_date:null,fee_per_kg:12,max_kg:8,letter_fee:5,phone_fee:null,luggage_fee:null,notes:'Heading back to Atlanta. Happy to carry items from Liberia for the diaspora community.',created_at:new Date().toISOString()},
 ];
 const DEMO_R = {
   1:[
@@ -997,7 +1026,9 @@ async function loadAll(){
 /* ── POST TRIP ── */
 async function submitPost(){
   const n=document.getElementById('f-name').value.trim(),c=document.getElementById('f-contact').value.trim(),
-        o=document.getElementById('f-origin').value.trim(),d=document.getElementById('f-dest').value.trim(),
+        toLib = curTripDirection === 'to_liberia',
+        o=toLib ? document.getElementById('f-origin').value.trim() : document.getElementById('f-origin-liberia').value.trim(),
+        d=toLib ? document.getElementById('f-dest').value.trim() : document.getElementById('f-dest-us').value.trim(),
         dt=document.getElementById('f-date').value,rt=document.getElementById('f-return').value,
         fee=parseFloat(document.getElementById('f-fee').value),kg=parseFloat(document.getElementById('f-maxkg').value),
         letterfee=parseFloat(document.getElementById('f-letterfee').value)||null,
@@ -1007,7 +1038,7 @@ async function submitPost(){
   if(!n||!c||!o||!dt||!fee||!kg){showToast('Please fill in all required fields.',true);return;}
   if(!document.getElementById('f-agree').checked){showToast('Please agree to the Terms of Use and Prohibited Items Policy.',true);return;}
   const btn=document.getElementById('submit-btn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div> Posting...';
-  const rec={name:n,contact:c,origin:o,destination:d||'Monrovia (ROB)',travel_date:dt,return_date:rt||null,fee_per_kg:fee,max_kg:kg,letter_fee:letterfee,phone_fee:phonefee,luggage_fee:luggagefee,notes:nt||null};
+  const rec={name:n,contact:c,origin:o,destination:d||'Monrovia (ROB)',direction:curTripDirection,travel_date:dt,return_date:rt||null,fee_per_kg:fee,max_kg:kg,letter_fee:letterfee,phone_fee:phonefee,luggage_fee:luggagefee,notes:nt||null};
   if(!sb){
     posts=[{...rec,id:Date.now(),created_at:new Date().toISOString()},...posts];
     renderFiltered();updateStats();clearPF();btn.disabled=false;btn.innerHTML='✈ Post Trip';showToast('✓ Trip posted! (Demo mode)');return;
@@ -1017,7 +1048,7 @@ async function submitPost(){
   if(error){showToast('Error: '+error.message,true);}else{clearPF();loadAll();showToast('✓ Trip posted!');}
 }
 function clearPF(){
-  ['f-name','f-contact','f-origin','f-date','f-return','f-fee','f-maxkg','f-letterfee','f-phonefee','f-luggagefee','f-notes'].forEach(i=>document.getElementById(i).value='');
+  ['f-name','f-contact','f-origin','f-origin-liberia','f-date','f-return','f-fee','f-maxkg','f-letterfee','f-phonefee','f-luggagefee','f-notes','f-dest-us'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
   document.getElementById('f-dest').value='Monrovia (ROB)';
   document.getElementById('f-agree').checked=false;
 }
@@ -1058,6 +1089,48 @@ function toggleRev(pid){
   const b=document.getElementById('reviews-body-'+pid),t=document.getElementById('toggle-'+pid);
   const o=b.classList.contains('open');b.classList.toggle('open',!o);t.classList.toggle('expanded',!o);
 }
+let curTripDirection = 'to_liberia'; // direction for post form
+let curDirFilter     = 'all';        // direction filter for listings
+
+function setTripDirection(dir) {
+  curTripDirection = dir;
+  const toLib = dir === 'to_liberia';
+
+  // Toggle buttons
+  document.getElementById('dir-btn-to-liberia').classList.toggle('type-btn-active', toLib);
+  document.getElementById('dir-btn-to-us').classList.toggle('type-btn-active', !toLib);
+
+  // Swap origin/dest fields
+  const originUS  = document.getElementById('f-origin');
+  const originLib = document.getElementById('f-origin-liberia');
+  const destLib   = document.getElementById('f-dest');
+  const destUS    = document.getElementById('f-dest-us');
+  const originLbl = document.getElementById('f-origin-label');
+  const destLbl   = document.getElementById('f-dest-label');
+
+  if (toLib) {
+    originUS.style.display  = '';  originLib.style.display = 'none';
+    destLib.style.display   = '';  destUS.style.display    = 'none';
+    originLbl.textContent   = 'Departure City / Airport (US)';
+    destLbl.textContent     = 'Destination in Liberia';
+    document.getElementById('post-section-sub').textContent = 'Flying to Liberia? Post your dates and earn extra on your journey.';
+  } else {
+    originUS.style.display  = 'none'; originLib.style.display = '';
+    destLib.style.display   = 'none'; destUS.style.display    = '';
+    originLbl.textContent   = 'Departure City in Liberia';
+    destLbl.textContent     = 'Destination City (US)';
+    document.getElementById('post-section-sub').textContent = 'Flying back to the US from Liberia? Post your dates and help the community ship home.';
+  }
+}
+
+function setDirFilter(dir, el) {
+  curDirFilter = dir;
+  document.querySelectorAll('[id^="dir-filter-"]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderFiltered();
+}
+
+
 function setFilter(f,el){
   curFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
@@ -1083,7 +1156,8 @@ function renderFiltered() {
   if(curFilter==='top-rated') data = [...data].sort((a,b)=>(avgRating(b.id)??-1)-(avgRating(a.id)??-1));
 
   // Apply location search
-  if(locQuery) data = data.filter(d=>(d.origin||'').toLowerCase().includes(locQuery));
+  if(locQuery) data = data.filter(d=>(d.origin||'').toLowerCase().includes(locQuery) || (d.destination||'').toLowerCase().includes(locQuery));
+  if(curDirFilter !== 'all') data = data.filter(d => d.direction === curDirFilter);
 
   // Build dynamic city chips from all posts (not filtered)
   buildCityChips(posts, locQuery);
@@ -1174,6 +1248,7 @@ function buildCard(p,today){
         <div class="listing-name-row">
           <span class="listing-name">${esc(p.name)}</span>
           ${up?'<span class="badge badge-upcoming">UPCOMING</span>':''}
+          ${p.direction==='to_us'?'<span class="badge" style="background:rgba(37,99,235,0.15);color:#60a5fa;border:1px solid rgba(37,99,235,0.3);">🇱🇷→🇺🇸 To US</span>':'<span class="badge" style="background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.3);">🇺🇸→🇱🇷 To Liberia</span>'}
         </div>
         ${ratingRow}
         <div class="listing-route">
@@ -1826,3 +1901,4 @@ window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOSt
 </script>
 </body>
 </html>
+
