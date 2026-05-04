@@ -1,0 +1,16 @@
+{
+  "name": "africarryapp",
+  "version": "1.0.0",
+  "description": "AfriCarryApp — Peer-to-peer mail delivery marketplace",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "stripe": "^14.0.0",
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
