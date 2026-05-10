@@ -35,8 +35,6 @@
   .btn-cancel { background:transparent; color:var(--muted); border:1px solid var(--border); padding:10px 18px; border-radius:10px; font-weight:500; cursor:pointer; font-size:14px; font-family:'DM Sans',sans-serif; }
   .btn-save:hover { background:#f0b030; }
   .step-badge { display:inline-flex; width:22px; height:22px; background:var(--accent); color:#000; border-radius:50%; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
-  .setup-steps { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
-  .setup-step { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--muted); line-height:1.5; }
   .setup-step code { background:rgba(232,160,32,0.15); color:var(--accent); padding:1px 6px; border-radius:4px; font-size:12px; }
 
   header { padding:18px 40px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(10,15,30,0.96); backdrop-filter:blur(12px); z-index:100; }
@@ -44,12 +42,36 @@
   .logo-text { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; }
   .logo-text span { color:var(--accent); }
   .logo-sub { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
-  nav { display:flex; gap:8px; }
+  nav { display:flex; gap:8px; align-items:center; }
   .nav-btn { padding:8px 18px; border-radius:8px; border:none; cursor:pointer; font-size:13px; font-weight:500; font-family:'DM Sans',sans-serif; transition:all .2s; }
   .nav-btn.ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
   .nav-btn.ghost:hover { color:var(--text); border-color:var(--accent); }
   .nav-btn.primary { background:var(--accent); color:#000; font-weight:700; }
   .nav-btn.primary:hover { background:#f0b030; }
+
+  /* ── AUTH ── */
+  .auth-avatar { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#000; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:2px solid rgba(232,160,32,0.4); flex-shrink:0; }
+  .auth-dropdown { position:relative; }
+  .auth-dropdown-menu { position:absolute; right:0; top:42px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:8px; min-width:180px; z-index:200; box-shadow:0 8px 24px rgba(0,0,0,0.4); display:none; }
+  .auth-dropdown-menu.open { display:block; animation:fadeIn .15s ease; }
+  .auth-dropdown-menu p { font-size:11px; color:var(--muted); padding:6px 10px; border-bottom:1px solid var(--border); margin-bottom:6px; word-break:break-all; }
+  .auth-menu-btn { width:100%; padding:8px 12px; background:transparent; border:none; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif; text-align:left; cursor:pointer; border-radius:8px; transition:background .15s; }
+  .auth-menu-btn:hover { background:var(--surface); }
+  .auth-menu-btn.red { color:var(--red); }
+
+  /* ── AUTH MODAL ── */
+  .auth-tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
+  .auth-tab { padding:10px; background:var(--surface); border:2px solid var(--border); border-radius:10px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:var(--muted); transition:all .2s; }
+  .auth-tab.active { border-color:var(--accent); color:var(--accent); background:rgba(232,160,32,0.08); }
+  .auth-divider { display:flex; align-items:center; gap:10px; margin:14px 0; }
+  .auth-divider span { font-size:11px; color:var(--muted); white-space:nowrap; }
+  .auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .btn-google { width:100%; padding:11px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:all .2s; margin-bottom:12px; }
+  .btn-google:hover { border-color:var(--accent); background:rgba(232,160,32,0.05); }
+  .auth-error { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--red); margin-bottom:10px; display:none; }
+  .auth-success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:8px 12px; font-size:12px; color:var(--green); margin-bottom:10px; display:none; }
+  .forgot-link { font-size:11px; color:var(--muted); cursor:pointer; text-decoration:underline; margin-top:4px; display:inline-block; }
+  .forgot-link:hover { color:var(--accent); }
 
   .hero { padding:60px 40px 50px; text-align:center; position:relative; overflow:hidden; }
   .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(232,160,32,0.08) 0%,transparent 65%),radial-gradient(ellipse at 20% 80%,rgba(37,99,235,0.06) 0%,transparent 55%); pointer-events:none; }
@@ -426,9 +448,77 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal" style="max-width:420px;">
+
+    <!-- TABS -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-tab-signin" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab" id="auth-tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+
+    <!-- ERROR / SUCCESS -->
+    <div class="auth-error" id="auth-error"></div>
+    <div class="auth-success" id="auth-success"></div>
+
+    <!-- SOCIAL SIGN IN -->
+    <button class="btn-google" onclick="signInWithGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+    <button class="btn-google" onclick="signInWithApple()" style="background:#000;border-color:#000;color:#fff;">
+      <svg width="18" height="18" viewBox="0 0 814 1000" fill="white"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 484.5 0 332.7 0 186.3 0 83.2 47.7 31 90 31c47.1 0 80.5 39.5 141.9 39.5 58.2 0 99.4-40.8 165.9-40.8 49.3 0 106.4 28.1 147.7 88.3zm-85.7-104.5c-30.3-35.6-73.9-62.2-116.7-62.2-3.2 0-6.5.3-9.7.6 1.3 38.9 17.6 76.3 43.5 103.7 25.2 27.4 65.7 47.7 101.4 51.3 3.2 0 6.5.3 9.7.3-1.3-36.9-11.6-73.9-28.2-93.7z"/></svg>
+      Continue with Apple
+    </button>
+
+    <div class="auth-divider"><span>or use email</span></div>
+
+    <!-- SIGN IN FORM -->
+    <div id="auth-signin-form">
+      <div class="payment-field">
+        <label>Email</label>
+        <input type="email" id="signin-email" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="payment-field">
+        <label>Password</label>
+        <input type="password" id="signin-password" placeholder="Your password" autocomplete="current-password"/>
+      </div>
+      <span class="forgot-link" onclick="resetPassword()">Forgot password?</span>
+      <button class="btn-pay" onclick="signIn()" style="margin-top:14px;">Sign In</button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px;">
+        No account? <span style="color:var(--accent);cursor:pointer;" onclick="switchAuthTab('signup')">Create one free →</span>
+      </p>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div id="auth-signup-form" style="display:none;">
+      <div class="payment-field">
+        <label>Full Name</label>
+        <input type="text" id="signup-name" placeholder="Your full name" autocomplete="name"/>
+      </div>
+      <div class="payment-field">
+        <label>Email</label>
+        <input type="email" id="signup-email" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="payment-field">
+        <label>Password <span style="font-weight:400;color:var(--muted);font-size:10px;">min 6 characters</span></label>
+        <input type="password" id="signup-password" placeholder="Create a password" autocomplete="new-password"/>
+      </div>
+      <button class="btn-pay" onclick="signUp()" style="margin-top:14px;">Create Free Account</button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px;">
+        Already have an account? <span style="color:var(--accent);cursor:pointer;" onclick="switchAuthTab('signin')">Sign in →</span>
+      </p>
+    </div>
+
+    <div class="modal-actions" style="margin-top:8px;">
+      <button class="btn-cancel" onclick="closeAuth()" style="width:100%;text-align:center;">Close</button>
+    </div>
+  </div>
+</div>
+
 <div id="setup-banner">
-  <span><span class="status-dot demo"></span> Demo Mode — sample data. Connect Supabase to go live.</span>
-  <button onclick="openConfig()">⚙️ Connect Supabase</button>
+  <span><span class="status-dot demo"></span> Demo Mode — contact admin to activate live data.</span>
 </div>
 
 <!-- FULL LUGGAGE DISCLAIMER MODAL -->
@@ -680,26 +770,6 @@
 </div>
 
 
-<div class="modal-overlay" id="config-modal">
-  <div class="modal">
-    <h2>🔌 Connect to Supabase</h2>
-    <p>Follow these steps to set up your database, then enter your credentials below.</p>
-    <div class="setup-steps">
-      <div class="setup-step"><span class="step-badge">1</span><div>Go to <strong>supabase.com</strong>, create a free account and start a new project.</div></div>
-      <div class="setup-step"><span class="step-badge">2</span><div>Open <strong>SQL Editor</strong> and run the <code>setup.sql</code> file included with this app.</div></div>
-      <div class="setup-step"><span class="step-badge">3</span><div>Go to <strong>Project Settings → API</strong>. Copy your <strong>Project URL</strong> and <strong>anon key</strong>.</div></div>
-      <div class="setup-step"><span class="step-badge">4</span><div>Paste them below and click Save!</div></div>
-    </div>
-    <label>Supabase Project URL</label>
-    <input id="sb-url" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co"/>
-    <label>Supabase Anon Key</label>
-    <input id="sb-key" type="text" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."/>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeConfig()">Cancel</button>
-      <button class="btn-save" onclick="saveConfig()">✓ Save & Connect</button>
-    </div>
-  </div>
-</div>
 
 <!-- LEGAL DISCLAIMER MODAL -->
 <div class="modal-overlay" id="legal-modal">
@@ -817,7 +887,23 @@
     <button class="nav-btn ghost" onclick="openLegal()">📋 Terms</button>
     <a href="faq.html" class="nav-btn ghost" style="text-decoration:none;">❓ FAQ</a>
     <button class="nav-btn ghost" onclick="scrollToListings()">View Travelers</button>
-    <button class="nav-btn primary" onclick="scrollToPost()">✈ Post Your Trip</button>
+    <!-- AUTH NAV -->
+    <div id="auth-signed-out" style="display:flex;gap:8px;">
+      <button class="nav-btn ghost" onclick="openAuth('signin')">Sign In</button>
+      <button class="nav-btn primary" onclick="openAuth('signup')">✈ Join Free</button>
+    </div>
+    <div id="auth-signed-in" style="display:none;align-items:center;gap:8px;">
+      <button class="nav-btn primary" onclick="scrollToPost()">✈ Post Your Trip</button>
+      <div class="auth-dropdown">
+        <div class="auth-avatar" id="auth-avatar" onclick="toggleAuthMenu()">?</div>
+        <div class="auth-dropdown-menu" id="auth-menu">
+          <p id="auth-menu-email">user@email.com</p>
+          <button class="auth-menu-btn" onclick="scrollToPost();toggleAuthMenu()">✈ Post a Trip</button>
+          <button class="auth-menu-btn" onclick="openConfirmDelivery();toggleAuthMenu()">✅ Confirm Delivery</button>
+          <button class="auth-menu-btn red" onclick="signOut()">Sign Out</button>
+        </div>
+      </div>
+    </div>
   </nav>
 </header>
 
@@ -946,7 +1032,8 @@
     <a onclick="openLegal()">🚫 Prohibited Items</a>
     <a href="faq.html">❓ FAQ</a>
     <a href="https://www.dhl.com/us-en/home/get-a-quote.html" target="_blank">DHL Rate Calculator</a>
-    <a onclick="openConfig()">⚙️ Connect Supabase</a>  </div>
+    <a href="mailto:support@africarryapp.com">✉ support@africarryapp.com</a>
+  </div>
   <div class="footer-copy">© 2026 AfriCarryApp. All rights reserved. Users are solely responsible for customs compliance.</div>
 </footer>
 
@@ -988,20 +1075,25 @@ function initSB(){
     try{
       sb=window.supabase.createClient(u,k);
       document.getElementById('setup-banner').style.display='none';
-      // Quick connection test
-      sb.from('travel_posts').select('id', {count:'exact',head:true})
-        .then(({error, count})=>{
-          if(error) {
-            console.error('Supabase connection test failed:', error);
-            showToast('Database connection error: ' + error.message, true);
+      // Connection test
+      sb.from('travel_posts').select('id',{count:'exact',head:true})
+        .then(({error,count})=>{
+          if(error){
+            console.error('❌ Supabase connection FAILED:', error.message);
+            // Show banner again with error
+            const banner = document.getElementById('setup-banner');
+            banner.style.display='flex';
+            banner.style.background='linear-gradient(135deg,#7f1d1d,#991b1b)';
+            banner.innerHTML=`<span>❌ Database connection failed: ${error.message}. Check Vercel environment variables.</span>`;
+            sb = null; // reset so demo mode kicks in
           } else {
-            console.log('✓ Supabase connected —', count, 'trips in database');
+            console.log('✅ Supabase connected —', count, 'trips in database');
           }
         });
       return true;
     }catch(e){ console.error('Supabase init error:', e); }
   }
-  // Fetch credentials from backend
+  // Fetch credentials from /api/config backend
   fetch('/api/config')
     .then(r=>r.json())
     .then(d=>{
@@ -1010,27 +1102,22 @@ function initSB(){
         localStorage.setItem(SB_KEY_K,d.key);
         sb=window.supabase.createClient(d.url,d.key);
         document.getElementById('setup-banner').style.display='none';
+        console.log('✅ Supabase credentials loaded from /api/config');
         loadAll();
+        initAuth();
       } else {
-        console.warn('No Supabase credentials returned from /api/config');
+        console.error('❌ /api/config returned no credentials — check Vercel env vars SUPABASE_URL and SUPABASE_ANON_KEY');
       }
     })
-    .catch(err=>{ console.warn('Could not fetch config:', err); });
+    .catch(err=>{
+      console.error('❌ Could not reach /api/config:', err.message, '— Check api/config.js is deployed to Vercel');
+    });
   return false;
 }
 function openLegal(){document.getElementById('legal-modal').classList.add('open');}
 function closeLegal(){document.getElementById('legal-modal').classList.remove('open');}
-function openConfig(){document.getElementById('config-modal').classList.add('open');}
 
 
-function closeConfig(){document.getElementById('config-modal').classList.remove('open');}
-function saveConfig(){
-  const u=document.getElementById('sb-url').value.trim(),k=document.getElementById('sb-key').value.trim();
-  if(!u||!k){showToast('Please enter both URL and key.',true);return;}
-  localStorage.setItem(SB_URL_K,u);localStorage.setItem(SB_KEY_K,k);
-  closeConfig();initSB();
-  initStripe();loadAll();showToast('✓ Connected to Supabase!');
-}
 
 /* ── LOAD ALL ── */
 async function loadAll(){
@@ -1046,6 +1133,12 @@ async function loadAll(){
 
 /* ── POST TRIP ── */
 async function submitPost(){
+  // Require login
+  if(!currentUser) {
+    openAuth('signup');
+    showToast('Please create a free account to post your trip.', true);
+    return;
+  }
   const n=document.getElementById('f-name').value.trim(),c=document.getElementById('f-contact').value.trim(),
         toLib = curTripDirection === 'to_liberia',
         o=toLib ? document.getElementById('f-origin').value.trim() : document.getElementById('f-origin-liberia').value.trim(),
@@ -1060,9 +1153,17 @@ async function submitPost(){
   if(!document.getElementById('f-agree').checked){showToast('Please agree to the Terms of Use and Prohibited Items Policy.',true);return;}
   const btn=document.getElementById('submit-btn');btn.disabled=true;btn.innerHTML='<div class="spinner"></div> Posting...';
   const rec={name:n,contact:c,origin:o,destination:d||'Monrovia (ROB)',direction:curTripDirection,travel_date:dt,return_date:rt||null,fee_per_kg:fee,max_kg:kg,letter_fee:letterfee,phone_fee:phonefee,luggage_fee:luggagefee,notes:nt||null};
+
+  // DEBUG — open browser console (F12) to see this
+  console.log('submitPost — Supabase connected:', sb ? 'YES' : 'NO — running in demo mode');
+  console.log('Record:', JSON.stringify(rec));
+
   if(!sb){
+    console.warn('DEMO MODE: Trip not saved to database. Check SUPABASE_URL and SUPABASE_ANON_KEY in Vercel env vars and that /api/config is deployed.');
     posts=[{...rec,id:Date.now(),created_at:new Date().toISOString()},...posts];
-    renderFiltered();updateStats();clearPF();btn.disabled=false;btn.innerHTML='✈ Post Trip';showToast('✓ Trip posted! (Demo mode)');return;
+    renderFiltered();updateStats();clearPF();btn.disabled=false;btn.innerHTML='✈ Post Trip';
+    showToast('⚠ Not connected to database — trip not saved. Contact admin.',true);
+    return;
   }
   const{data:inserted, error}=await sb.from('travel_posts').insert([rec]).select();
   btn.disabled=false;btn.innerHTML='✈ Post Trip';
@@ -1349,7 +1450,7 @@ function updateStats(){
 }
 
 // ─── ESCROW & STRIPE ──────────────────────────────────────
-const STRIPE_PK = 'pk_test_YOUR_STRIPE_PUBLISHABLE_KEY'; // Replace with your Stripe publishable key
+const STRIPE_PK = 'pk_live_51TT1q0GbNjYPCeutoILGXCQmqoh9WgwguflmxyrJ9vBcSz0Q6kCsqExYzxaNcZZfaztW4vGcWChNwz1luHrzl0sC00YfM9EnT8'; 
 const API_BASE  = '/api/escrow';
 
 let stripeInstance = null;
@@ -1476,6 +1577,140 @@ function getRecipients() {
   return recipients;
 }
 
+
+// ── AUTHENTICATION ────────────────────────────────────────
+let currentUser = null;
+
+function openAuth(tab='signin') {
+  document.getElementById('auth-modal').classList.add('open');
+  switchAuthTab(tab);
+  clearAuthMessages();
+}
+function closeAuth() {
+  document.getElementById('auth-modal').classList.remove('open');
+  clearAuthMessages();
+}
+function clearAuthMessages() {
+  const err = document.getElementById('auth-error');
+  const suc = document.getElementById('auth-success');
+  if(err) { err.style.display='none'; err.textContent=''; }
+  if(suc) { suc.style.display='none'; suc.textContent=''; }
+}
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.style.display = 'block';
+}
+function showAuthSuccess(msg) {
+  const el = document.getElementById('auth-success');
+  el.textContent = msg; el.style.display = 'block';
+}
+function switchAuthTab(tab) {
+  document.getElementById('auth-signin-form').style.display = tab==='signin' ? 'block' : 'none';
+  document.getElementById('auth-signup-form').style.display = tab==='signup' ? 'block' : 'none';
+  document.getElementById('auth-tab-signin').classList.toggle('active', tab==='signin');
+  document.getElementById('auth-tab-signup').classList.toggle('active', tab==='signup');
+  clearAuthMessages();
+}
+function toggleAuthMenu() {
+  document.getElementById('auth-menu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('auth-menu');
+  const avatar = document.getElementById('auth-avatar');
+  if(menu && avatar && !menu.contains(e.target) && !avatar.contains(e.target)) {
+    menu.classList.remove('open');
+  }
+});
+function updateAuthUI(user) {
+  currentUser = user;
+  const signedOut = document.getElementById('auth-signed-out');
+  const signedIn  = document.getElementById('auth-signed-in');
+  const avatar    = document.getElementById('auth-avatar');
+  const menuEmail = document.getElementById('auth-menu-email');
+  if(user) {
+    signedOut.style.display = 'none';
+    signedIn.style.display  = 'flex';
+    const initials = (user.user_metadata?.full_name || user.email || '?')
+      .split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    if(avatar)    avatar.textContent    = initials;
+    if(menuEmail) menuEmail.textContent = user.email;
+  } else {
+    signedOut.style.display = 'flex';
+    signedIn.style.display  = 'none';
+  }
+}
+async function signUp() {
+  if(!sb){ showAuthError('Not connected to database.'); return; }
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass  = document.getElementById('signup-password').value;
+  if(!name)           { showAuthError('Please enter your full name.'); return; }
+  if(!email)          { showAuthError('Please enter your email.'); return; }
+  if(pass.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
+  clearAuthMessages();
+  const { data, error } = await sb.auth.signUp({
+    email, password: pass,
+    options: { data: { full_name: name } }
+  });
+  if(error) { showAuthError(error.message); return; }
+  if(data.user?.identities?.length === 0) {
+    showAuthError('An account with this email already exists. Please sign in.'); return;
+  }
+  showAuthSuccess('Account created! Check your email to confirm then sign in.');
+}
+async function signIn() {
+  if(!sb){ showAuthError('Not connected to database.'); return; }
+  const email = document.getElementById('signin-email').value.trim();
+  const pass  = document.getElementById('signin-password').value;
+  if(!email || !pass) { showAuthError('Please enter your email and password.'); return; }
+  clearAuthMessages();
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error) { showAuthError(error.message); return; }
+  updateAuthUI(data.user);
+  closeAuth();
+  showToast('Welcome back ' + (data.user.user_metadata?.full_name || '') + '!');
+}
+async function signInWithGoogle() {
+  if(!sb){ showAuthError('Not connected to database.'); return; }
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if(error) showAuthError(error.message);
+}
+async function signInWithApple() {
+  if(!sb){ showAuthError('Not connected to database.'); return; }
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'apple',
+    options: { redirectTo: window.location.href }
+  });
+  if(error) showAuthError(error.message);
+}
+async function signOut() {
+  if(!sb) return;
+  await sb.auth.signOut();
+  updateAuthUI(null);
+  document.getElementById('auth-menu').classList.remove('open');
+  showToast('Signed out successfully.');
+}
+async function resetPassword() {
+  if(!sb){ showAuthError('Not connected to database.'); return; }
+  const email = document.getElementById('signin-email').value.trim();
+  if(!email) { showAuthError('Enter your email above first.'); return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+  if(error) { showAuthError(error.message); return; }
+  showAuthSuccess('Password reset email sent. Check your inbox.');
+}
+function initAuth() {
+  if(!sb) return;
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if(session) updateAuthUI(session.user);
+  });
+  sb.auth.onAuthStateChange((event, session) => {
+    updateAuthUI(session?.user || null);
+    if(event === 'SIGNED_IN') closeAuth();
+  });
+}
 
 let bookingType = 'multi'; // kept for compatibility
 function setBookingType(type) { updateBookingSummary(); }
@@ -1929,13 +2164,14 @@ async function setupPayouts(post_id, traveler_name, traveler_email) {
 window.addEventListener('DOMContentLoaded',()=>{  const today=new Date().toISOString().split('T')[0];
   document.getElementById('f-date').min=today;
   document.getElementById('f-return').min=today;
-  if(localStorage.getItem(SB_URL_K)){document.getElementById('sb-url').value=localStorage.getItem(SB_URL_K);document.getElementById('sb-key').value=localStorage.getItem(SB_KEY_K);}
   initSB();
   initStripe();
   loadAll();
+  setTimeout(() => initAuth(), 600);
 });
 </script>
 </body>
 </html>
+
 
 
